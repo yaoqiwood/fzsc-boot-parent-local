@@ -75,6 +75,6 @@ public class SampleTest {
     // author:lvdandan-----date：20190315---for:添加数据日志测试----
     @Test
     public void testPtypeList() throws IOException {
-        ptypeService.syncSendData2Server(49250);
+        ptypeService.syncSendPtypeInfData2Server(75897);
     }
 }

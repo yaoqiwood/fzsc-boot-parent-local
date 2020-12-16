@@ -1,16 +1,20 @@
 package org.jeecg.modules.gwb.service.impl;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.jeecg.common.exception.JeecgBootException;
+import org.jeecg.common.util.HTTPUtil;
 import org.jeecg.common.util.HttpXmlBuilderUtil;
 import org.jeecg.modules.gwb.entity.Ptype;
 import org.jeecg.modules.gwb.mapper.PtypeMapper;
 import org.jeecg.modules.gwb.service.IPtypeService;
-import org.jeecg.modules.shiro.vo.DefContants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +22,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import cn.hutool.core.util.XmlUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -42,7 +47,7 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
     }
 
     @Override
-    public void syncSendData2Server(Integer updateTag) throws IOException {
+    public void syncSendPtypeInfData2Server(Integer updateTag) throws IOException {
         log.info("查询封装传输数据开始......");
         QueryWrapper<Ptype> queryWrapper4LookUp = new QueryWrapper<>();
         queryWrapper4LookUp.lambda().gt(Ptype::getUpdatetag, updateTag);
@@ -56,34 +61,13 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
         StringBuilder sendStr = HttpXmlBuilderUtil.buildSendDataBuilder(sendSBData, new Date());
         BufferedReader reader = null;
         try {
-            String strMessage;
-            StringBuilder builder = new StringBuilder();
-            // 接报文的地址
-            URL uploadServlet = new URL(postDataUrl);
-            HttpURLConnection servletConnection = (HttpURLConnection) uploadServlet.openConnection();
-            // 设置连接参数
-            servletConnection.setRequestMethod("POST");
-            servletConnection.setRequestProperty(DefContants.X_ACCESS_SIGN_CHECK, filterCheckPublicKey);
-            servletConnection.setDoOutput(true);
-            servletConnection.setDoInput(true);
-            servletConnection.setAllowUserInteraction(true);
-
-            // 开启流，写入XML数据
-            OutputStream output = servletConnection.getOutputStream();
-            log.info("发送的报文：");
-            log.info(sendStr.toString());
-
-            output.write(sendStr.toString().getBytes());
-            output.flush();
-            output.close();
-
-            // 获取返回的数据
-            InputStream inputStream = servletConnection.getInputStream();
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            while ((strMessage = reader.readLine()) != null) {
-                builder.append(strMessage);
-            }
+            String builder = HTTPUtil.httpPostMethod(postDataUrl, filterCheckPublicKey, sendStr.toString(), reader);
             log.info("接收返回值:" + builder);
+            Map<String, Object> retMessageMap = XmlUtil.xmlToMap(builder.toString());
+            if (!String.valueOf(true).equals(retMessageMap.get("success"))) {
+                throw new JeecgBootException("错误，同步不成功");
+            }
+            // TODO 同步信息记录历史
 
         } catch (ConnectException | MalformedURLException e) {
             e.printStackTrace();
@@ -96,5 +80,15 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
                 reader.close();
             }
         }
+    }
+
+    /**
+     * 同步价格信息
+     * @param updateDate
+     */
+    @Override
+    public void syncPriceInfData2Server(Date updateDate) {
+        log.info("查询价格封装传输数据开始......");
+
     }
 }

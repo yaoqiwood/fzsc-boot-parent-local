@@ -1,6 +1,7 @@
 package org.jeecg.modules.gwb.service;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.jeecg.modules.gwb.entity.Ptype;
 
@@ -12,5 +13,7 @@ public interface IPtypeService extends IService<Ptype> {
 
     void test();
 
-    void syncSendData2Server(Integer rowIndex) throws IOException;
+    void syncSendPtypeInfData2Server(Integer updateTag) throws IOException;
+
+    void syncPriceInfData2Server(Date updateDate);
 }

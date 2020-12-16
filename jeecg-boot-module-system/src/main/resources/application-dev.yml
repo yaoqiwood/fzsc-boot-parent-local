@@ -219,8 +219,10 @@ swagger:
   enable: false
 ptype:
   postDataUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/syncPtypeInfFromLocal
+  pricePostDataUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/syncPtypePriceInfFromLocal
   filter:
     check:
       public:
         key: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCrBOOMywqYrWDKKwKWmga/6ea3QToPJrNFqmwbodr8gc/N1nzW667R9PGO1DZDeNkMQzbvcS0csetBrGZtu8quDq8Grnc30Z+wpdGiHRUXFG1pkQa4DihTiLlbPEv3M6tsImwB4D5BH/8tHmgNlPaglsNbgqdTgd8uOp5xTTz/xQIDAQAB
+
 
