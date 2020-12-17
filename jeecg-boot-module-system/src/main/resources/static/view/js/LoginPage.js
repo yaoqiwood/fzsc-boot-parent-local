@@ -74,3 +74,7 @@ function clickEvent() {
         $("#randomImage").attr("src", imgSrc + randomKey);
     })
 }
+
+function initPageInf() {
+    
+}

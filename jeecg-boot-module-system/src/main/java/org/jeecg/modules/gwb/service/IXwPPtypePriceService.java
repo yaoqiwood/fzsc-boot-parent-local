@@ -1,5 +1,6 @@
 package org.jeecg.modules.gwb.service;
 
+import java.io.IOException;
 import java.util.Date;
 
 import org.jeecg.modules.gwb.entity.XwPPtypePrice;
@@ -14,5 +15,5 @@ public interface IXwPPtypePriceService extends IService<XwPPtypePrice> {
      * 同步价格信息
      * @param updateDate
      */
-    void syncPPtypePriceInfData2Server(Date updateDate);
+    void syncPPtypePriceInfData2Server(Date updateDate) throws IOException;
 }

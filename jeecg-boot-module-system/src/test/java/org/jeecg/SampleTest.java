@@ -1,15 +1,18 @@
 package org.jeecg;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.demo.mock.MockController;
 import org.jeecg.modules.demo.test.entity.JeecgDemo;
 import org.jeecg.modules.demo.test.mapper.JeecgDemoMapper;
 import org.jeecg.modules.demo.test.service.IJeecgDemoService;
 import org.jeecg.modules.gwb.service.IPtypeService;
+import org.jeecg.modules.gwb.service.IXwPPtypePriceService;
 import org.jeecg.modules.system.service.ISysDataLogService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,6 +38,9 @@ public class SampleTest {
 
     @Resource
     private IPtypeService ptypeService;
+
+    @Resource
+    private IXwPPtypePriceService xwPPtypePriceService;
 
     @Test
     public void testSelect() {
@@ -76,5 +82,16 @@ public class SampleTest {
     @Test
     public void testPtypeList() throws IOException {
         ptypeService.syncSendPtypeInfData2Server(75897);
+    }
+
+    @Test
+    public void testPtypePriceList() {
+        try {
+            xwPPtypePriceService.syncPPtypePriceInfData2Server(DateUtils.parseDate("2020-01-01", "yyyy-MM-dd"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 }
