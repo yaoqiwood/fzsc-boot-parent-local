@@ -1,8 +1,8 @@
 package org.jeecg.modules.gwb.service;
 
 import java.io.IOException;
-import java.util.Date;
 
+import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 import org.jeecg.modules.gwb.entity.Ptype;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
@@ -13,7 +13,11 @@ public interface IPtypeService extends IService<Ptype> {
 
     void test();
 
-    void syncSendPtypeInfData2Server(Integer updateTag) throws IOException;
+    /**
+     * syncSendPtypeInfData2Server
+     * @return
+     * @throws IOException
+     */
+    HisPtpyeSync syncSendPtypeInfData2Server() throws IOException;
 
-    void syncPriceInfData2Server(Date updateDate);
 }

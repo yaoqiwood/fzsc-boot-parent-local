@@ -9,12 +9,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.jeecg.common.enumerate.EnumSyncPtypeStatus;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.util.HTTPUtil;
 import org.jeecg.common.util.HttpXmlBuilderUtil;
+import org.jeecg.common.util.SnowflakeUtil;
+import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 import org.jeecg.modules.gwb.entity.Ptype;
 import org.jeecg.modules.gwb.mapper.PtypeMapper;
+import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.jeecg.modules.gwb.service.IPtypeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +40,9 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
     @Value("${ptype.filter.check.public.key}")
     private String filterCheckPublicKey;
 
+    @Autowired
+    private IHisPtpyeSyncService hisPtpyeSyncService;
+
     @Override
     public void test() {
         Integer index = 800;
@@ -46,8 +54,14 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
         });
     }
 
+    /**
+     * syncSendPtypeInfData2Server
+     * @return
+     * @throws IOException
+     */
     @Override
-    public void syncSendPtypeInfData2Server(Integer updateTag) throws IOException {
+    public HisPtpyeSync syncSendPtypeInfData2Server() throws IOException {
+        Integer updateTag = hisPtpyeSyncService.selectMaxUpdateTag();
         log.info("查询封装传输数据开始......");
         QueryWrapper<Ptype> queryWrapper4LookUp = new QueryWrapper<>();
         queryWrapper4LookUp.lambda().gt(Ptype::getUpdatetag, updateTag);
@@ -64,11 +78,19 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
             String builder = HTTPUtil.httpPostMethod(postDataUrl, filterCheckPublicKey, sendStr.toString(), reader);
             log.info("接收返回值:" + builder);
             Map<String, Object> retMessageMap = XmlUtil.xmlToMap(builder.toString());
-            if (!String.valueOf(true).equals(retMessageMap.get("success"))) {
+            if (!String.valueOf(true).equals(retMessageMap.get("response_success"))) {
                 throw new JeecgBootException("错误，同步不成功");
             }
             // TODO 同步信息记录历史
-
+            HisPtpyeSync hisPtpyeSync = new HisPtpyeSync();
+            hisPtpyeSync.setHpsId(SnowflakeUtil.getNum().toString());
+            hisPtpyeSync.setUpdateTag(updateTag.toString());
+            hisPtpyeSync.setStatus(EnumSyncPtypeStatus.PTYPE.getCode());
+            hisPtpyeSync.setCreateTime(new Date());
+            hisPtpyeSync.setReceiveTime(new Date());
+            hisPtpyeSync.setRemoteHost(postDataUrl);
+            return hisPtpyeSync;
+            // saveHisInf(hisPtpyeSync);
         } catch (ConnectException | MalformedURLException e) {
             e.printStackTrace();
         } catch (ProtocolException e) {
@@ -80,15 +102,11 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
                 reader.close();
             }
         }
+        return null;
     }
 
-    /**
-     * 同步价格信息
-     * @param updateDate
-     */
-    @Override
-    public void syncPriceInfData2Server(Date updateDate) {
-        log.info("查询价格封装传输数据开始......");
-
-    }
+    // @DS("master")
+    // private void saveHisInf(HisPtpyeSync hisPtpyeSync4Save) {
+    // hisPtpyeSyncService.save(hisPtpyeSync4Save);
+    // }
 }

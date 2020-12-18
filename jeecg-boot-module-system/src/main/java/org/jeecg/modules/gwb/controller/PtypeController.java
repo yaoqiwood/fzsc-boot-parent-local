@@ -5,6 +5,8 @@ import java.util.Date;
 
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.util.DateUtils;
+import org.jeecg.modules.gwb.entity.HisPtpyeSync;
+import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.jeecg.modules.gwb.service.IPtypeService;
 import org.jeecg.modules.gwb.service.IXwPPtypePriceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +28,19 @@ public class PtypeController {
     @Autowired
     private IXwPPtypePriceService xwPPtypePriceService;
 
+    @Autowired
+    private IHisPtpyeSyncService hisPtpyeSyncService;
+
     /**
      * 同步商品信息
-     * @param updateTag
      * @return
      */
     @PostMapping(value = "syncSendPtypeInfData2Server")
-    public Result<?> syncSendPtypeInfData2Server(@RequestParam("updateTag") Integer updateTag) {
+    public Result<?> syncSendPtypeInfData2Server() { // @RequestParam("updateTag") Integer updateTag
         try {
-            ptypeService.syncSendPtypeInfData2Server(updateTag);
+            Integer updateTag = hisPtpyeSyncService.selectMaxUpdateTag();
+            HisPtpyeSync hisPtpyeSync = ptypeService.syncSendPtypeInfData2Server();
+            hisPtpyeSyncService.save(hisPtpyeSync);
             return Result.ok("同步商品信息成功");
         } catch (Exception e) {
             log.error(e.getMessage(), e);
