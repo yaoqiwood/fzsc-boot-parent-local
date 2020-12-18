@@ -11,6 +11,7 @@ import org.jeecg.modules.demo.mock.MockController;
 import org.jeecg.modules.demo.test.entity.JeecgDemo;
 import org.jeecg.modules.demo.test.mapper.JeecgDemoMapper;
 import org.jeecg.modules.demo.test.service.IJeecgDemoService;
+import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.jeecg.modules.gwb.service.IPtypeService;
 import org.jeecg.modules.gwb.service.IXwPPtypePriceService;
 import org.jeecg.modules.system.service.ISysDataLogService;
@@ -38,6 +39,9 @@ public class SampleTest {
 
     @Resource
     private IPtypeService ptypeService;
+
+    @Resource
+    private IHisPtpyeSyncService hisPtpyeSyncService;
 
     @Resource
     private IXwPPtypePriceService xwPPtypePriceService;
@@ -81,7 +85,8 @@ public class SampleTest {
     // author:lvdandan-----date：20190315---for:添加数据日志测试----
     @Test
     public void testPtypeList() throws IOException {
-        ptypeService.syncSendPtypeInfData2Server(75897);
+        // Integer updateTag = hisPtpyeSyncService.selectMaxUpdateTag();
+        ptypeService.syncSendPtypeInfData2Server();
     }
 
     @Test
