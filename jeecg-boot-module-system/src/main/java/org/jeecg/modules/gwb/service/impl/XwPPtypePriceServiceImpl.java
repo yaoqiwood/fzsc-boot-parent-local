@@ -7,13 +7,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.jeecg.common.enumerate.EnumSyncPtypeStatus;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.HTTPUtil;
 import org.jeecg.common.util.HttpXmlBuilderUtil;
+import org.jeecg.common.util.SnowflakeUtil;
+import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 import org.jeecg.modules.gwb.entity.XwPPtypePrice;
 import org.jeecg.modules.gwb.mapper.XwPPtypePriceMapper;
+import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.jeecg.modules.gwb.service.IXwPPtypePriceService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,13 +41,16 @@ public class XwPPtypePriceServiceImpl extends ServiceImpl<XwPPtypePriceMapper, X
     @Value("${ptype.filter.check.public.key}")
     private String filterCheckPublicKey;
 
+    @Autowired
+    private IHisPtpyeSyncService hisPtpyeSyncService;
+
     /**
      * 同步价格信息
-     * @param updateDate
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void syncPPtypePriceInfData2Server(Date updateDate) throws IOException {
+    public HisPtpyeSync syncPPtypePriceInfData2Server() throws IOException {
+        Date updateDate = hisPtpyeSyncService.selectMaxUpdatePriceTime();
         QueryWrapper<XwPPtypePrice> queryWrapper = new QueryWrapper<>();
         String strDate = DateUtils.date2Str(updateDate, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         queryWrapper.lambda().gt(XwPPtypePrice::getUpdatedt, strDate);
@@ -62,7 +70,13 @@ public class XwPPtypePriceServiceImpl extends ServiceImpl<XwPPtypePriceMapper, X
             if (!String.valueOf(true).equals(retMessageMap.get("success"))) {
                 throw new JeecgBootException("错误，同步不成功");
             }
-            // TODO 同步信息记录历史
+            HisPtpyeSync hisPtpyeSync = new HisPtpyeSync();
+            hisPtpyeSync.setHpsId(SnowflakeUtil.getNum().toString());
+            hisPtpyeSync.setStatus(EnumSyncPtypeStatus.PRICE.getCode());
+            hisPtpyeSync.setUpdatePriceTime(updateDate);
+            hisPtpyeSync.setRemoteHost(postDataUrl);
+            hisPtpyeSync.setCreateTime(new Date());
+            return hisPtpyeSync;
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -70,5 +84,6 @@ public class XwPPtypePriceServiceImpl extends ServiceImpl<XwPPtypePriceMapper, X
                 reader.close();
             }
         }
+        return null;
     }
 }

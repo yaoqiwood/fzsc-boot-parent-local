@@ -63,6 +63,7 @@ function clickEvent() {
                 btnObj.key = true;
                 $("#loginButton").html("登陆");
                 if (resp.success) {
+                    localStorage.setItem("token", resp.result.token);
                     alert("登录成功");
                 } else {
                     alert(resp.message)
@@ -76,5 +77,5 @@ function clickEvent() {
 }
 
 function initPageInf() {
-    
+
 }

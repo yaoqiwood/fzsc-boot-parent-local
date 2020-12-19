@@ -1,10 +1,6 @@
 package org.jeecg.modules.gwb.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.jeecg.common.api.vo.Result;
-import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.jeecg.modules.gwb.service.IPtypeService;
@@ -13,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,18 +45,31 @@ public class PtypeController {
 
     /**
      * 同步价格信息
-     * @param updateDateStr
      * @return
      */
     @PostMapping(value = "syncPPtypePriceInfData2Server")
-    public Result<?> syncPPtypePriceInfData2Server(@RequestParam("updateDate") String updateDateStr) {
+    public Result<?> syncPPtypePriceInfData2Server() {
         try {
-            Date updateDate = DateUtils.str2Date(updateDateStr, new SimpleDateFormat("YYYY-MM-DD HH:MM:SS"));
-            xwPPtypePriceService.syncPPtypePriceInfData2Server(updateDate);
+            HisPtpyeSync hisPtpyeSync = xwPPtypePriceService.syncPPtypePriceInfData2Server();
+            hisPtpyeSyncService.save(hisPtpyeSync);
             return Result.ok("同步价格信息成功");
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return Result.error("同步价格信息失败");
+        }
+    }
+
+    /**
+     * initPtypeSyncPage
+     * @return
+     */
+    @PostMapping(value = "initPtypeSyncPage")
+    public Result<?> initPtypeSyncPage() {
+        try {
+            return Result.ok(hisPtpyeSyncService.initPtypeSyncPage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Result.error(e.getMessage());
         }
     }
 }
