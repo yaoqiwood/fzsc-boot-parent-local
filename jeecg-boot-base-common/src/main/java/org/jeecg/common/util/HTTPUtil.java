@@ -13,23 +13,35 @@ public class HTTPUtil {
 
     public static String httpPostMethod(String postDataUrl, String filterCheckPublicKey, String sendStr,
             BufferedReader reader) throws IOException {
+        return httpMethod(postDataUrl, filterCheckPublicKey, "POST", sendStr, reader);
+    }
+
+    public static String httpGetMethod(String postDataUrl, String filterCheckPublicKey, String sendStr,
+            BufferedReader reader) throws IOException {
+        return httpMethod(postDataUrl, filterCheckPublicKey, "GET", sendStr, reader);
+    }
+
+    private static String httpMethod(String postDataUrl, String filterCheckPublicKey, String method, String sendStr,
+            BufferedReader reader) throws IOException {
         String strMessage;
         StringBuilder builder = new StringBuilder();
         // 接报文的地址
         URL uploadServlet = new URL(postDataUrl);
         HttpURLConnection servletConnection = (HttpURLConnection) uploadServlet.openConnection();
         // 设置连接参数
-        servletConnection.setRequestMethod("POST");
+        servletConnection.setRequestMethod(method);
         servletConnection.setRequestProperty(DefContants.X_ACCESS_SIGN_CHECK, filterCheckPublicKey);
         servletConnection.setRequestProperty(DefContants.CONTENT_TYPE, DefContants.XML_CONTENT);
         servletConnection.setRequestProperty(DefContants.CONTENT_LENGTH, Integer.toString(sendStr.length()));
-        servletConnection.setDoOutput(true);
+        if (!("GET".equals(method))) {
+            servletConnection.setDoOutput(true);
+        }
         servletConnection.setDoInput(true);
         servletConnection.setAllowUserInteraction(true);
 
         // 开启流，写入XML数据
         OutputStream output = servletConnection.getOutputStream();
-        log.info("发送的报文：\n" + sendStr.toString());
+        log.info("正在发送报文......");
 
         output.write(sendStr.toString().getBytes());
         output.flush();
