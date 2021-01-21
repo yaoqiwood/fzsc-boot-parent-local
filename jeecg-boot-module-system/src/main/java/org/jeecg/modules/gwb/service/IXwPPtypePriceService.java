@@ -1,6 +1,7 @@
 package org.jeecg.modules.gwb.service;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 import org.jeecg.modules.gwb.entity.XwPPtypePrice;
@@ -14,5 +15,5 @@ public interface IXwPPtypePriceService extends IService<XwPPtypePrice> {
     /**
      * 同步价格信息
      */
-    HisPtpyeSync syncPPtypePriceInfData2Server() throws IOException;
+    HisPtpyeSync syncPPtypePriceInfData2Server() throws IOException, ParseException;
 }

@@ -127,7 +127,7 @@ spring:
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
       datasource:
         master:
-          url: jdbc:mysql://127.0.0.1:3306/local_gwb_data?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
+          url: jdbc:mysql://192.168.0.12:3306/local_gwb_data?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
           username: root
           password: '*hr#oWCI'
           driver-class-name: com.mysql.jdbc.Driver
@@ -219,9 +219,9 @@ swagger:
   enable: false
 ptype:
   getSyncMaxUpdateTagFromServerUrl: https://api.web.guangwabao.com/gwb-boot/gwb/ptypeSyncApi/getSyncMaxUpdateTagFromServer
-  getSyncMaxUpdateDateFromServerUrl: http://api.web.guangwabao.com/gwb-boot/gwb/ptypeSyncApi/getSyncMaxUpdateDateFromServer
-  postDataUrl: http://api.web.guangwabao.com/gwb-boot/gwb/ptypeSyncApi/syncPtypeInfFromLocal
-  pricePostDataUrl: http://api.web.guangwabao.com/gwb-boot/gwb/ptypeSyncApi/syncPtypePriceInfFromLocal
+  getSyncMaxUpdateDateFromServerUrl: https://api.web.guangwabao.com/gwb-boot/gwb/ptypeSyncApi/getSyncMaxUpdateDateFromServer
+  postDataUrl: https://api.web.guangwabao.com/gwb-boot/gwb/ptypeSyncApi/syncPtypeInfFromLocal
+  pricePostDataUrl: https://api.web.guangwabao.com/gwb-boot/gwb/ptypeSyncApi/syncPtypePriceInfFromLocal
   filter:
     check:
       public:

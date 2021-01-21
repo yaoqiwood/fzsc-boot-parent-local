@@ -1,6 +1,7 @@
 package org.jeecg;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -88,7 +89,7 @@ public class SampleTest {
     }
 
     @Test
-    public void testPtypePriceList() throws IOException {
+    public void testPtypePriceList() throws IOException, ParseException {
         xwPPtypePriceService.syncPPtypePriceInfData2Server();
 
         // try {

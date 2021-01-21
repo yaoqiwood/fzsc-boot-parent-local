@@ -1,6 +1,7 @@
 package org.jeecg.modules.quartz.job;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.gwb.entity.HisPtpyeSync;
@@ -31,6 +32,8 @@ public class SyncPtypePriceInfJob {
             hisPtpyeSyncService.save(hisPtpyeSync);
         } catch (IOException e) {
             log.error("执行失败,原因：" + e.getMessage());
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 }

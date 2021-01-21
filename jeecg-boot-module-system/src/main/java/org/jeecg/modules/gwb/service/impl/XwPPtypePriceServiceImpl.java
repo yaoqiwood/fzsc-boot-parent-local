@@ -53,14 +53,14 @@ public class XwPPtypePriceServiceImpl extends ServiceImpl<XwPPtypePriceMapper, X
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public HisPtpyeSync syncPPtypePriceInfData2Server() throws IOException {
+    public HisPtpyeSync syncPPtypePriceInfData2Server() throws IOException, ParseException {
         BufferedReader reader = null;
         try {
-            log.info("查询最大更新日期开始......");
+            log.info("查询最大更新日期开始......URL:\n" + getSyncMaxUpdateDateFromServerUrl);
             String strDate = httpGetSyncMethodFromServer(getSyncMaxUpdateDateFromServerUrl, reader);
             QueryWrapper<XwPPtypePrice> queryWrapper = new QueryWrapper<>();
-            Date updateDate = DateUtils.parseDate(strDate, "yyyy-MM-dd HH:mm:ss");
-            log.info("最大更新日期为：" + DateUtils.parseDate(strDate, "yyyy-MM-dd HH:mm:ss"));
+            Date updateDate = DateUtils.parseDate(strDate, "yyyy-MM-dd HH:mm:ss:SSS");
+            log.info("最大更新日期为：" + DateUtils.parseDate(strDate, "yyyy-MM-dd HH:mm:ss:SSS"));
             // String strDate = DateUtils.date2Str(updateDate, new
             // SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
             queryWrapper.lambda().gt(XwPPtypePrice::getUpdatedt, strDate);
@@ -86,16 +86,11 @@ public class XwPPtypePriceServiceImpl extends ServiceImpl<XwPPtypePriceMapper, X
             // hisPtpyeSync.setRemoteHost(postDataUrl);
             hisPtpyeSync.setCreateTime(new Date());
             return hisPtpyeSync;
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
         } finally {
             if (reader != null) {
                 reader.close();
             }
         }
-        return null;
     }
 
     private String httpGetSyncMethodFromServer(String url, BufferedReader reader) throws IOException {

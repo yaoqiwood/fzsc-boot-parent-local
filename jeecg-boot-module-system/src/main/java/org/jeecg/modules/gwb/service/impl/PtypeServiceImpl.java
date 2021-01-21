@@ -2,9 +2,6 @@ package org.jeecg.modules.gwb.service.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +76,7 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
                 throw new JeecgBootException("没有检测到新的商品信息更新");
             }
             StringBuilder sendSBData = new StringBuilder(JSONArray.toJSONString(ptypeList));
-            log.info("查询数据封装完毕\n");
+            log.info("查询数据封装完毕，正在向URL发送请求数据:\n" + postDataUrl);
             StringBuilder sendStr = HttpXmlBuilderUtil.buildSendDataBuilder(sendSBData, new Date());
             String builder = HTTPUtil.httpPostMethod(postDataUrl, filterCheckPublicKey, sendStr.toString(), reader);
             log.info("接收返回值:" + builder);
@@ -98,18 +95,11 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
             // hisPtpyeSync.setRemoteHost(postDataUrl);
             return hisPtpyeSync;
             // saveHisInf(hisPtpyeSync);
-        } catch (ConnectException | MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         } finally {
             if (reader != null) {
                 reader.close();
             }
         }
-        return null;
     }
 
     private String httpGetSyncMethodFromServer(String url, BufferedReader reader) throws IOException {
