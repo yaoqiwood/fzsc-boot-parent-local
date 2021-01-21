@@ -1,25 +1,25 @@
 server:
-  port: 8080
+  port: 10086
   tomcat:
     max-swallow-size: -1
   servlet:
-    context-path: /jeecg-boot
+    context-path: /jeecg-boot-local
   compression:
     enabled: true
     min-response-size: 1024
     mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
 
 management:
- endpoints:
-  web:
-   exposure:
-    include: metrics,httptrace
+  endpoints:
+    web:
+      exposure:
+        include: metrics,httptrace
 
 spring:
   servlet:
-     multipart:
-        max-file-size: 10MB
-        max-request-size: 10MB
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   mail:
     host: smtp.163.com
     username: jeecgos@163.com
@@ -61,16 +61,16 @@ spring:
   jackson:
     date-format:   yyyy-MM-dd HH:mm:ss
     time-zone:   GMT+8
-  jpa:
-    open-in-view: false
+  aop:
+    proxy-target-class: true
   activiti:
     check-process-definitions: false
     #启用作业执行器
     async-executor-activate: false
     #启用异步执行器
     job-executor-activate: false
-  aop:
-    proxy-target-class: true
+  jpa:
+    open-in-view: false
   #配置freemarker
   freemarker:
     # 设置模板后缀名
@@ -107,14 +107,14 @@ spring:
         # 初始化大小，最小，最大
         initial-size: 5
         min-idle: 5
-        maxActive: 1000
+        maxActive: 20
         # 配置获取连接等待超时的时间
         maxWait: 60000
         # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
         timeBetweenEvictionRunsMillis: 60000
         # 配置一个连接在池中最小生存的时间，单位是毫秒
         minEvictableIdleTimeMillis: 300000
-        validationQuery: SELECT 1 FROM DUAL
+        validationQuery: SELECT 1 FROM ptype
         testWhileIdle: true
         testOnBorrow: false
         testOnReturn: false
@@ -127,16 +127,18 @@ spring:
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
       datasource:
         master:
-          url: jdbc:mysql://127.0.0.1:3306/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
+          url: jdbc:mysql://127.0.0.1:3306/local_gwb_data?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
           username: root
-          password: root
+          password: '*hr#oWCI'
           driver-class-name: com.mysql.jdbc.Driver
           # 多数据源配置
-          #multi-datasource1:
-          #url: jdbc:mysql://localhost:3306/jeecg-boot2?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true
-          #username: root
-          #password: root
-          #driver-class-name: com.mysql.jdbc.Driver
+        multi-datasource-gwb:
+          #          jdbc:microsoft:sqlserver://
+          #          jdbc:sqlserver://
+          url: jdbc:sqlserver://192.168.0.99:1433;DatabaseName=fzsc
+          username: Gwb4Back
+          password: '*hr#oWCI'
+          driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   #redis 配置
   redis:
     database: 0
@@ -167,20 +169,20 @@ mybatis-plus:
     # 返回类型为Map,显示null对应的字段
     call-setters-on-nulls: true
 #jeecg专用配置
-jeecg :
+jeecg:
   # 本地：local\Minio：minio\阿里云：alioss
   uploadType: local
-  path :
+  path:
     #文件上传根目录 设置
-    upload: /opt/jeecg-boot/upload
+    upload: D://opt//upFiles
     #webapp文件路径
-    webapp: /opt/jeecg-boot/webapp
+    webapp: D://opt//webapp
   #短信秘钥
   sms:
-     accessKeyId: LTAIpW4gUG7xYDNI
-     accessKeySecret: ??
+    accessKeyId: ??
+    accessKeySecret: ??
   shiro:
-     excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**
+    excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**
   #阿里云oss存储配置
   oss:
     endpoint: oss-cn-beijing.aliyuncs.com
@@ -188,11 +190,11 @@ jeecg :
     secretKey: ??
     bucketName: jeecgos
     staticDomain: https://static.jeecg.com
-  # ElasticSearch 设置
+  # ElasticSearch 6设置
   elasticsearch:
     cluster-name: jeecg-ES
     cluster-nodes: 127.0.0.1:9200
-    check-enabled: true
+    check-enabled: false
   # 表单设计器配置
   desform:
     # 主题颜色（仅支持 16进制颜色代码）
@@ -205,12 +207,24 @@ jeecg :
     minio_name: ??
     minio_pass: ??
     bucketName: otatest
+#Mybatis输出sql日志
+logging:
+  level:
+    org.jeecg.modules.system.mapper: debug
 #cas单点登录
 cas:
   prefixUrl: http://cas.example.org:8443/cas
-logging:
-  level:
-    org.jeecg.modules.system.mapper : debug
 #enable swagger
 swagger:
   enable: false
+ptype:
+  getSyncMaxUpdateTagFromServerUrl: https://api.web.guangwabao.com/gwb-boot/gwb/ptypeSyncApi/getSyncMaxUpdateTagFromServer
+  getSyncMaxUpdateDateFromServerUrl: http://api.web.guangwabao.com/gwb-boot/gwb/ptypeSyncApi/getSyncMaxUpdateDateFromServer
+  postDataUrl: http://api.web.guangwabao.com/gwb-boot/gwb/ptypeSyncApi/syncPtypeInfFromLocal
+  pricePostDataUrl: http://api.web.guangwabao.com/gwb-boot/gwb/ptypeSyncApi/syncPtypePriceInfFromLocal
+  filter:
+    check:
+      public:
+        key: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCrBOOMywqYrWDKKwKWmga/6ea3QToPJrNFqmwbodr8gc/N1nzW667R9PGO1DZDeNkMQzbvcS0csetBrGZtu8quDq8Grnc30Z+wpdGiHRUXFG1pkQa4DihTiLlbPEv3M6tsImwB4D5BH/8tHmgNlPaglsNbgqdTgd8uOp5xTTz/xQIDAQAB
+
+

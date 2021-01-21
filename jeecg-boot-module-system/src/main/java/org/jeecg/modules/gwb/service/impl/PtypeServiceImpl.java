@@ -24,8 +24,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.base.Strings;
 
 import cn.hutool.core.util.XmlUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,9 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
 
     @Value("${ptype.filter.check.public.key}")
     private String filterCheckPublicKey;
+
+    @Value("${ptype.getSyncMaxUpdateTagFromServerUrl}")
+    private String getSyncMaxUpdateTagFromServerUrl;
 
     @Autowired
     private IHisPtpyeSyncService hisPtpyeSyncService;
@@ -59,36 +64,38 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
      * @return
      * @throws IOException
      */
+    @DS("multi-datasource-gwb")
     @Override
     public HisPtpyeSync syncSendPtypeInfData2Server() throws IOException {
-        Integer updateTag = hisPtpyeSyncService.selectMaxUpdateTag();
-        log.info("查询封装传输数据开始......");
-        QueryWrapper<Ptype> queryWrapper4LookUp = new QueryWrapper<>();
-        queryWrapper4LookUp.lambda().gt(Ptype::getUpdatetag, updateTag);
-        List<Ptype> ptypeList = list(queryWrapper4LookUp);
-        if (ptypeList.size() == 0) {
-            throw new JeecgBootException("没有检测到新的商品信息更新");
-        }
-        StringBuilder sendSBData = new StringBuilder(JSONArray.toJSONString(ptypeList));
-        log.info("查询数据封装完毕\n数据为：" + sendSBData.toString());
-
-        StringBuilder sendStr = HttpXmlBuilderUtil.buildSendDataBuilder(sendSBData, new Date());
         BufferedReader reader = null;
         try {
+            log.info("查询最大Tag开始......\n");
+            String maxTag = this.httpGetSyncMethodFromServer(getSyncMaxUpdateTagFromServerUrl, reader);
+            log.info("查询封装传输数据开始......MaxTag:" + maxTag);
+            QueryWrapper<Ptype> queryWrapper4LookUp = new QueryWrapper<>();
+            queryWrapper4LookUp.lambda().gt(Ptype::getUpdatetag, maxTag);
+            List<Ptype> ptypeList = list(queryWrapper4LookUp);
+            if (ptypeList.size() == 0) {
+                throw new JeecgBootException("没有检测到新的商品信息更新");
+            }
+            StringBuilder sendSBData = new StringBuilder(JSONArray.toJSONString(ptypeList));
+            log.info("查询数据封装完毕\n");
+            StringBuilder sendStr = HttpXmlBuilderUtil.buildSendDataBuilder(sendSBData, new Date());
             String builder = HTTPUtil.httpPostMethod(postDataUrl, filterCheckPublicKey, sendStr.toString(), reader);
             log.info("接收返回值:" + builder);
-            Map<String, Object> retMessageMap = XmlUtil.xmlToMap(builder.toString());
+            Map<String, Object> retMessageMap = XmlUtil.xmlToMap(builder);
             if (!String.valueOf(true).equals(retMessageMap.get("response_success"))) {
                 throw new JeecgBootException("错误，同步不成功");
             }
-            // TODO 同步信息记录历史
+            // 同步信息记录历史
             HisPtpyeSync hisPtpyeSync = new HisPtpyeSync();
             hisPtpyeSync.setHpsId(SnowflakeUtil.getNum().toString());
-            hisPtpyeSync.setUpdateTag(updateTag.toString());
+            hisPtpyeSync.setUpdateTag(maxTag);
             hisPtpyeSync.setStatus(EnumSyncPtypeStatus.PTYPE.getCode());
             hisPtpyeSync.setCreateTime(new Date());
             hisPtpyeSync.setReceiveTime(new Date());
-            hisPtpyeSync.setRemoteHost(postDataUrl);
+            hisPtpyeSync.setAffectNum(ptypeList.size());
+            // hisPtpyeSync.setRemoteHost(postDataUrl);
             return hisPtpyeSync;
             // saveHisInf(hisPtpyeSync);
         } catch (ConnectException | MalformedURLException e) {
@@ -103,6 +110,20 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
             }
         }
         return null;
+    }
+
+    private String httpGetSyncMethodFromServer(String url, BufferedReader reader) throws IOException {
+        log.info("发送URL:" + url);
+        String builder = HTTPUtil.httpPostMethod(url, filterCheckPublicKey, "", reader);
+        Map<String, Object> retMessageMap = XmlUtil.xmlToMap(builder);
+        log.info("接收返回值：" + builder);
+        if (!String.valueOf(true).equals(retMessageMap.get("response_success"))) {
+            throw new JeecgBootException("错误，同步失败，获取数据错误");
+        }
+        if (Strings.isNullOrEmpty(retMessageMap.get("response_return_data").toString())) {
+            throw new JeecgBootException("错误，数据为空且错误");
+        }
+        return retMessageMap.get("response_return_data").toString();
     }
 
     // @DS("master")

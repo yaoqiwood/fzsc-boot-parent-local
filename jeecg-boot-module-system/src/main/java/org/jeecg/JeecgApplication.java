@@ -1,26 +1,21 @@
 package org.jeecg;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.Context;
-import org.apache.tomcat.util.scan.StandardJarScanner;
-import org.jeecg.modules.swing.LoginFrame;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import javax.swing.*;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.apache.catalina.Context;
+import org.apache.tomcat.util.scan.StandardJarScanner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
-@EnableSwagger2
 @SpringBootApplication
+@EnableScheduling
 public class JeecgApplication {
 
     // public JeecgApplication() {

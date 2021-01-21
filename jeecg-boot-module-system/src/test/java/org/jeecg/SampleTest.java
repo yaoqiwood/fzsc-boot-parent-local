@@ -1,12 +1,10 @@
 package org.jeecg;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.demo.mock.MockController;
 import org.jeecg.modules.demo.test.entity.JeecgDemo;
 import org.jeecg.modules.demo.test.mapper.JeecgDemoMapper;
@@ -90,13 +88,16 @@ public class SampleTest {
     }
 
     @Test
-    public void testPtypePriceList() {
-        try {
-            xwPPtypePriceService.syncPPtypePriceInfData2Server(DateUtils.parseDate("2020-01-01", "yyyy-MM-dd"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+    public void testPtypePriceList() throws IOException {
+        xwPPtypePriceService.syncPPtypePriceInfData2Server();
+
+        // try {
+        // xwPPtypePriceService.syncPPtypePriceInfData2Server(DateUtils.parseDate("2020-01-01",
+        // "yyyy-MM-dd"));
+        // } catch (IOException e) {
+        // e.printStackTrace();
+        // } catch (ParseException e) {
+        // e.printStackTrace();
+        // }
     }
 }

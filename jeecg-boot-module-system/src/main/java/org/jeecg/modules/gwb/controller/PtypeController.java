@@ -1,21 +1,23 @@
 package org.jeecg.modules.gwb.controller;
 
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.modules.gwb.entity.HisPtpyeSync;
+import org.jeecg.modules.gwb.entity.Ptype;
 import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.jeecg.modules.gwb.service.IPtypeService;
 import org.jeecg.modules.gwb.service.IXwPPtypePriceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/ptype")
-public class PtypeController {
+public class PtypeController extends JeecgController<Ptype, IPtypeService> {
 
     @Autowired
     private IPtypeService ptypeService;
@@ -33,7 +35,7 @@ public class PtypeController {
     @PostMapping(value = "syncSendPtypeInfData2Server")
     public Result<?> syncSendPtypeInfData2Server() { // @RequestParam("updateTag") Integer updateTag
         try {
-            Integer updateTag = hisPtpyeSyncService.selectMaxUpdateTag();
+            // Integer updateTag = hisPtpyeSyncService.selectMaxUpdateTag();
             HisPtpyeSync hisPtpyeSync = ptypeService.syncSendPtypeInfData2Server();
             hisPtpyeSyncService.save(hisPtpyeSync);
             return Result.ok("同步商品信息成功");
@@ -63,7 +65,7 @@ public class PtypeController {
      * initPtypeSyncPage
      * @return
      */
-    @PostMapping(value = "initPtypeSyncPage")
+    @PostMapping({ "initPtypeSyncPage" })
     public Result<?> initPtypeSyncPage() {
         try {
             return Result.ok(hisPtpyeSyncService.initPtypeSyncPage());

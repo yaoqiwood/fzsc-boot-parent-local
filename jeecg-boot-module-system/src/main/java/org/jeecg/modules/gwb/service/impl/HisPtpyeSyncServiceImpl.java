@@ -9,6 +9,7 @@ import org.jeecg.modules.gwb.mapper.HisPtpyeSyncMapper;
 import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.springframework.stereotype.Service;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 /**
@@ -23,11 +24,13 @@ public class HisPtpyeSyncServiceImpl extends ServiceImpl<HisPtpyeSyncMapper, His
      * selectMaxUpdateTag
      * @return
      */
+    @DS("master")
     @Override
     public Integer selectMaxUpdateTag() {
         return baseMapper.selectMaxUpdateTag();
     }
 
+    @DS("master")
     @Override
     public Date selectMaxUpdatePriceTime() {
         return baseMapper.selectMaxUpdatePriceTime();

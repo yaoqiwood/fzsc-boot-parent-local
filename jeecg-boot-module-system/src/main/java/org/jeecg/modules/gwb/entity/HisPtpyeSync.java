@@ -22,6 +22,8 @@ public class HisPtpyeSync {
 
     private String updateTag;
 
+    private Integer affectNum;
+
     private String status;
 
     private Date createTime;

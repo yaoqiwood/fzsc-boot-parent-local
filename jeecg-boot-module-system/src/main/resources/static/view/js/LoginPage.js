@@ -64,11 +64,16 @@ function clickEvent() {
                 $("#loginButton").html("登陆");
                 if (resp.success) {
                     localStorage.setItem("token", resp.result.token);
-                    alert("登录成功");
+                    // alert("登录成功");
+                    new $.zui.Messager('登录成功', {
+                        type: 'success' // 定义颜色主题
+                    }).show();
+                    $(location).attr("href", "./SyncManager.html")
                 } else {
-                    alert(resp.message)
+                    alert(resp.message);
                 }
-                console.log(resp);
+                randomKey = Math.random();
+                $("#randomImage").attr("src", imgSrc + randomKey);
             }
         });
         randomKey = Math.random();

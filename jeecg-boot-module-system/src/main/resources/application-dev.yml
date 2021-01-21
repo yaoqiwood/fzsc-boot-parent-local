@@ -137,7 +137,7 @@ spring:
           #          jdbc:sqlserver://
           url: jdbc:sqlserver://192.168.0.99:1433;DatabaseName=cx20191231
           username: Gwb4Back
-          password: Gwb2020!
+          password: '*hr#oWCI'
           driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   #redis 配置
   redis:
@@ -218,6 +218,8 @@ cas:
 swagger:
   enable: false
 ptype:
+  getSyncMaxUpdateTagFromServerUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/getSyncMaxUpdateTagFromServer
+  getSyncMaxUpdateDateFromServerUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/getSyncMaxUpdateDateFromServer
   postDataUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/syncPtypeInfFromLocal
   pricePostDataUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/syncPtypePriceInfFromLocal
   filter:
