@@ -1,6 +1,11 @@
 spring:
   profiles:
     active: prod
+  http:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
 swagger:
   production: false
   basic:

@@ -101,4 +101,9 @@ public class SampleTest {
         // e.printStackTrace();
         // }
     }
+
+    // public static void main(String[] args) {
+    // String str = "<<<<<asad>> &a&& 'b' \"111";
+    // System.out.println(XMLTransferUtil.transferXML(str));
+    // }
 }

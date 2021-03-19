@@ -135,7 +135,7 @@ spring:
         multi-datasource-gwb:
           #          jdbc:microsoft:sqlserver://
           #          jdbc:sqlserver://
-          url: jdbc:sqlserver://192.168.0.99:1433;DatabaseName=cx20191231
+          url: jdbc:sqlserver://192.168.0.99:1433;DatabaseName=fzsc
           username: Gwb4Back
           password: '*hr#oWCI'
           driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -220,8 +220,10 @@ swagger:
 ptype:
   getSyncMaxUpdateTagFromServerUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/getSyncMaxUpdateTagFromServer
   getSyncMaxUpdateDateFromServerUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/getSyncMaxUpdateDateFromServer
+  getSyncMaxStocksDateFromServerUrl: http://localhost:8080/jeecg-boot/gwb/goodsStocksApi/remoteSearchMaxSaveDate
   postDataUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/syncPtypeInfFromLocal
   pricePostDataUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/syncPtypePriceInfFromLocal
+  syncPostStocksDataUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/syncGoodsStocksFromLocal
   filter:
     check:
       public:
