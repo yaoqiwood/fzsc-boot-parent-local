@@ -29,6 +29,7 @@ public class HTTPUtil {
         URL uploadServlet = new URL(postDataUrl);
         HttpURLConnection servletConnection = (HttpURLConnection) uploadServlet.openConnection();
         // 设置连接参数
+        servletConnection.setRequestProperty("Charsert", "UTF-8");
         servletConnection.setRequestMethod(method);
         servletConnection.setRequestProperty(DefContants.X_ACCESS_SIGN_CHECK, filterCheckPublicKey);
         servletConnection.setRequestProperty(DefContants.CONTENT_TYPE, DefContants.XML_CONTENT);
