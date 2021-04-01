@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.jeecg.common.constant.DefContants;
+import org.jeecg.common.constant.DefConstants;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,9 +31,9 @@ public class HTTPUtil {
         // 设置连接参数
         servletConnection.setRequestProperty("Charsert", "UTF-8");
         servletConnection.setRequestMethod(method);
-        servletConnection.setRequestProperty(DefContants.X_ACCESS_SIGN_CHECK, filterCheckPublicKey);
-        servletConnection.setRequestProperty(DefContants.CONTENT_TYPE, DefContants.XML_CONTENT);
-        servletConnection.setRequestProperty(DefContants.CONTENT_LENGTH, Integer.toString(sendStr.length()));
+        servletConnection.setRequestProperty(DefConstants.X_ACCESS_SIGN_CHECK, filterCheckPublicKey);
+        servletConnection.setRequestProperty(DefConstants.CONTENT_TYPE, DefConstants.XML_CONTENT);
+        servletConnection.setRequestProperty(DefConstants.CONTENT_LENGTH, Integer.toString(sendStr.length()));
         if (!("GET".equals(method))) {
             servletConnection.setDoOutput(true);
         }

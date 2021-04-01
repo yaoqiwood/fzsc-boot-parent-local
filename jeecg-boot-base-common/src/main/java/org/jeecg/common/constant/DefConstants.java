@@ -1,6 +1,6 @@
 package org.jeecg.common.constant;
 
-public class DefContants {
+public class DefConstants {
 
     public final static String X_ACCESS_TOKEN = "X-Access-Token";
 
