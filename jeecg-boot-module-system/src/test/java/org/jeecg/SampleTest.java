@@ -12,11 +12,13 @@ import org.jeecg.modules.demo.test.mapper.JeecgDemoMapper;
 import org.jeecg.modules.demo.test.service.IJeecgDemoService;
 import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.jeecg.modules.gwb.service.IPtypeService;
+import org.jeecg.modules.gwb.service.ITGoodsStocksGlideService;
 import org.jeecg.modules.gwb.service.IXwPPtypePriceService;
 import org.jeecg.modules.system.service.ISysDataLogService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -44,6 +46,9 @@ public class SampleTest {
 
     @Resource
     private IXwPPtypePriceService xwPPtypePriceService;
+
+    @Autowired
+    private ITGoodsStocksGlideService goodsStocksGlideService;
 
     @Test
     public void testSelect() {
@@ -98,6 +103,15 @@ public class SampleTest {
         // } catch (IOException e) {
         // e.printStackTrace();
         // } catch (ParseException e) {
+        // e.printStackTrace();
+        // }
+    }
+
+    @Test
+    public void testTGoodsStock() {
+        // try {
+        // this.goodsStocksGlideService.syncTGoodsStocksInfFromServer();
+        // } catch (IOException e) {
         // e.printStackTrace();
         // }
     }

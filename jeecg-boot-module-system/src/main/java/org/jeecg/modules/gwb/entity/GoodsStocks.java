@@ -1,9 +1,10 @@
 package org.jeecg.modules.gwb.entity;
 
-import java.util.Date;
+import java.math.BigDecimal;
 
 import org.jeecgframework.poi.excel.annotation.Excel;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -50,7 +51,7 @@ public class GoodsStocks {
     /**qty*/
     @Excel(name = "qty", width = 15)
     @ApiModelProperty(value = "qty")
-    private java.math.BigDecimal qty;
+    private BigDecimal qty;
 
     /**price*/
     @Excel(name = "price", width = 15)
@@ -98,7 +99,14 @@ public class GoodsStocks {
     private String usefulenddate;
 
     /**
+     * 单据修改库存记录号
+     */
+    @TableField(exist = false)
+    private String vchcode;
+
+    /**
      * 保存时间
      */
-    private Date saveDate;
+    // @TableField(exist = false)
+    // private Date updateTime;
 }

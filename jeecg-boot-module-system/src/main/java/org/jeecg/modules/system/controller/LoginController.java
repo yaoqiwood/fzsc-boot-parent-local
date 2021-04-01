@@ -9,7 +9,7 @@ import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.constant.CommonConstant;
-import org.jeecg.common.constant.DefContants;
+import org.jeecg.common.constant.DefConstants;
 import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
@@ -122,7 +122,7 @@ public class LoginController {
     @RequestMapping(value = "/logout")
     public Result<Object> logout(HttpServletRequest request, HttpServletResponse response) {
         // 用户退出逻辑
-        String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
+        String token = request.getHeader(DefConstants.X_ACCESS_TOKEN);
         if (oConvertUtils.isEmpty(token)) {
             return Result.error("退出登录失败！");
         }

@@ -1,6 +1,9 @@
 package org.jeecg.modules.gwb.service;
 
+import java.io.IOException;
+
 import org.jeecg.modules.gwb.entity.GoodsStocks;
+import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -14,5 +17,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 @DS("multi-datasource-gwb")
 public interface IGoodsStocksService extends IService<GoodsStocks> {
+
+    /**
+     * 同步库存信息
+     * @return
+     * @throws IOException
+     */
+    HisPtpyeSync syncGoodsStocksInfFromServer() throws IOException;
 
 }

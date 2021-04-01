@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jeecg.common.constant.DefContants;
+import org.jeecg.common.constant.DefConstants;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,7 +75,7 @@ public class Swagger2Config implements WebMvcConfigurer {
      */
     @Bean
     SecurityScheme securityScheme() {
-        return new ApiKey(DefContants.X_ACCESS_TOKEN, DefContants.X_ACCESS_TOKEN, "header");
+        return new ApiKey(DefConstants.X_ACCESS_TOKEN, DefConstants.X_ACCESS_TOKEN, "header");
     }
 
     /**
@@ -85,7 +85,7 @@ public class Swagger2Config implements WebMvcConfigurer {
     private List<Parameter> setHeaderToken() {
         ParameterBuilder tokenPar = new ParameterBuilder();
         List<Parameter> pars = new ArrayList<>();
-        tokenPar.name(DefContants.X_ACCESS_TOKEN).description("token").modelRef(new ModelRef("string"))
+        tokenPar.name(DefConstants.X_ACCESS_TOKEN).description("token").modelRef(new ModelRef("string"))
                 .parameterType("header").required(false).build();
         pars.add(tokenPar.build());
         return pars;

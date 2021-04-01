@@ -59,8 +59,8 @@ spring:
             threadsInheritContextClassLoaderOfInitializingThread: true
   #json 时间戳统一转换
   jackson:
-    date-format:   yyyy-MM-dd HH:mm:ss
-    time-zone:   GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
   aop:
     proxy-target-class: true
   activiti:
@@ -135,9 +135,9 @@ spring:
         multi-datasource-gwb:
           #          jdbc:microsoft:sqlserver://
           #          jdbc:sqlserver://
-          url: jdbc:sqlserver://192.168.0.99:1433;DatabaseName=fzsc
-          username: Gwb4Back
-          password: '*hr#oWCI'
+          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=fzsc_local
+          username: pub
+          password: 'root'
           driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   #redis 配置
   redis:
@@ -220,10 +220,10 @@ swagger:
 ptype:
   getSyncMaxUpdateTagFromServerUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/getSyncMaxUpdateTagFromServer
   getSyncMaxUpdateDateFromServerUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/getSyncMaxUpdateDateFromServer
-  getSyncMaxStocksDateFromServerUrl: http://localhost:8080/jeecg-boot/gwb/goodsStocksApi/remoteSearchMaxSaveDate
+  remoteSearchMaxVchCodeUrl: http://localhost:8080/jeecg-boot/gwb/goodsStocksApi/remoteSearchMaxVchCode
   postDataUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/syncPtypeInfFromLocal
   pricePostDataUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/syncPtypePriceInfFromLocal
-  syncPostStocksDataUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/syncGoodsStocksFromLocal
+  syncGoodsStocksFromLocalUrl: http://localhost:8080/jeecg-boot/gwb/goodsStocksApi/syncGoodsStocksFromLocal
   filter:
     check:
       public:
