@@ -18,9 +18,9 @@ public interface GoodsStocksMapper extends BaseMapper<GoodsStocks> {
 
     /**
      * 搜索最大仓库单据更新值
-     * @param maxVchCode
+     * @param maxSaveDate
      * @return
      */
-    List<GoodsStockDto> searchGoodsStocksUpdateInf(@Param("maxVchCode") Integer maxVchCode);
+    List<GoodsStockDto> searchGoodsStocksUpdateInf(@Param("maxSaveDate") String maxSaveDate);
 
 }

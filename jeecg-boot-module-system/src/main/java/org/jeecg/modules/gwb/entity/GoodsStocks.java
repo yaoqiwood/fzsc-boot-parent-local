@@ -1,6 +1,7 @@
 package org.jeecg.modules.gwb.entity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import org.jeecgframework.poi.excel.annotation.Excel;
 
@@ -103,6 +104,8 @@ public class GoodsStocks {
      */
     @TableField(exist = false)
     private String vchcode;
+
+    private Date saveTime;
 
     /**
      * 保存时间

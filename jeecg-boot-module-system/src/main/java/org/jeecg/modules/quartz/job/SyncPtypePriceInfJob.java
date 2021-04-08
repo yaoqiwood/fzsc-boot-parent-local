@@ -24,7 +24,7 @@ public class SyncPtypePriceInfJob {
     private IHisPtpyeSyncService hisPtpyeSyncService;
 
     // 第一位是秒 以此类推
-    @Scheduled(fixedRate = 1000 * 60 * 2)
+    @Scheduled(fixedRate = 1000 * 60 * 1)
     private void process() {
         log.info("定时更新商品价格任务开始执行，现在时间为：" + DateUtils.now());
         try {

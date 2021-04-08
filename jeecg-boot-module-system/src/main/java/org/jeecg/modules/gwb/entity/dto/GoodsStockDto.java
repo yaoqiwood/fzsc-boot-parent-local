@@ -9,7 +9,7 @@ import lombok.Data;
 public class GoodsStockDto {
     private String vchcode;
 
-    private Date date;
+    private String date;
 
     private String vchType;
 
@@ -20,6 +20,10 @@ public class GoodsStockDto {
     private BigDecimal tQty;
 
     private BigDecimal tPrice;
+
+    private BigDecimal gPrice;
+
+    private BigDecimal gTotal;
 
     private BigDecimal qty;
 }

@@ -23,8 +23,8 @@ public class SyncPtypeInfJob {
     @Autowired
     private IHisPtpyeSyncService hisPtpyeSyncService;
 
-    // 第一位是秒 以此类推 频率改2分钟
-    @Scheduled(fixedRate = 1000 * 60 * 2)
+    // 第一位是秒 以此类推 频率改1分钟
+    @Scheduled(fixedRate = 1000 * 60 * 1)
     @Transactional(rollbackFor = Exception.class)
     void process() {
         log.info("定时开始同步商品信息任务执行，现在时间为：" + DateUtils.now() + "\n");

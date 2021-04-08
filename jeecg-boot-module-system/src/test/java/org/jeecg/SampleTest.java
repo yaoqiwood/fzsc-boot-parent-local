@@ -10,10 +10,7 @@ import org.jeecg.modules.demo.mock.MockController;
 import org.jeecg.modules.demo.test.entity.JeecgDemo;
 import org.jeecg.modules.demo.test.mapper.JeecgDemoMapper;
 import org.jeecg.modules.demo.test.service.IJeecgDemoService;
-import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
-import org.jeecg.modules.gwb.service.IPtypeService;
-import org.jeecg.modules.gwb.service.ITGoodsStocksGlideService;
-import org.jeecg.modules.gwb.service.IXwPPtypePriceService;
+import org.jeecg.modules.gwb.service.*;
 import org.jeecg.modules.system.service.ISysDataLogService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,6 +46,9 @@ public class SampleTest {
 
     @Autowired
     private ITGoodsStocksGlideService goodsStocksGlideService;
+
+    @Autowired
+    private IGoodsStocksService goodsStocksService;
 
     @Test
     public void testSelect() {
@@ -108,7 +108,14 @@ public class SampleTest {
     }
 
     @Test
-    public void testTGoodsStock() {
+    public void testGoodsStock() {
+
+        try {
+            this.goodsStocksService.syncGoodsStocksInfFromServer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         // try {
         // this.goodsStocksGlideService.syncTGoodsStocksInfFromServer();
         // } catch (IOException e) {

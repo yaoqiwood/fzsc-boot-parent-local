@@ -41,18 +41,18 @@ public class GoodsStocksServiceImpl extends ServiceImpl<GoodsStocksMapper, Goods
     @Value("${ptype.filter.check.public.key}")
     private String filterCheckPublicKey;
 
-    @Value("${ptype.remoteSearchMaxVchCodeUrl}")
-    private String remoteSearchMaxVchCodeUrl;
+    @Value("${ptype.remoteSearchMaxSaveTimeUrl}")
+    private String remoteSearchMaxSaveTimeUrl;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public HisPtpyeSync syncGoodsStocksInfFromServer() throws IOException {
         BufferedReader reader = null;
         try {
-            log.info("查询最大库存更新ID开始......URL:\n" + remoteSearchMaxVchCodeUrl);
-            String maxIndex = HttpXmlBuilderUtil.httpGetSyncMethodFromServer(remoteSearchMaxVchCodeUrl, reader,
+            log.info("查询最大库存更新ID开始......URL:\n" + remoteSearchMaxSaveTimeUrl);
+            String maxSaveDate = HttpXmlBuilderUtil.httpGetSyncMethodFromServer(remoteSearchMaxSaveTimeUrl, reader,
                     filterCheckPublicKey);
-            List<GoodsStockDto> goodsStockDtoList = baseMapper.searchGoodsStocksUpdateInf(Integer.parseInt(maxIndex));
+            List<GoodsStockDto> goodsStockDtoList = this.baseMapper.searchGoodsStocksUpdateInf(maxSaveDate);
 
             if (goodsStockDtoList.size() == 0) {
                 throw new JeecgBootException("没有检测到新的库存信息更新");
@@ -64,7 +64,10 @@ public class GoodsStocksServiceImpl extends ServiceImpl<GoodsStocksMapper, Goods
                 GoodsStocks temp = new GoodsStocks();
                 temp.setPtypeid(item.getPtypeid());
                 temp.setQty(item.getQty());
+                temp.setPrice(item.getGPrice());
+                temp.setTotal(item.getGTotal());
                 temp.setVchcode(item.getVchcode());
+                temp.setSaveTime(item.getSavedate());
                 goodsStocksList.add(temp);
             });
             StringBuilder sendSBData = new StringBuilder(JSONArray.toJSONString(goodsStocksList));
