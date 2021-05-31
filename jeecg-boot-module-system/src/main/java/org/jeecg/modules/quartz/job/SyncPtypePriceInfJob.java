@@ -10,6 +10,7 @@ import org.jeecg.modules.gwb.service.IXwPPtypePriceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,7 +26,8 @@ public class SyncPtypePriceInfJob {
 
     // 第一位是秒 以此类推
     @Scheduled(fixedRate = 1000 * 60 * 1)
-    private void process() {
+    @Transactional(rollbackFor = Exception.class)
+    void process() {
         log.info("定时更新商品价格任务开始执行，现在时间为：" + DateUtils.now());
         try {
             HisPtpyeSync hisPtpyeSync = pPtypePriceService.syncPPtypePriceInfData2Server();

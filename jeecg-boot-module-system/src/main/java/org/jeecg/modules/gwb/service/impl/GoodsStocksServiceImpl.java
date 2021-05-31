@@ -79,7 +79,7 @@ public class GoodsStocksServiceImpl extends ServiceImpl<GoodsStocksMapper, Goods
             log.info("接收返回值:" + builder);
             Map<String, Object> retMessageMap = XmlUtil.xmlToMap(builder.toString());
             if (!String.valueOf(true).equals(retMessageMap.get("response_success"))) {
-                throw new JeecgBootException("错误，同步不成功");
+                throw new JeecgBootException("错误，库存信息同步不成功");
             }
             HisPtpyeSync hisPtpyeSync = new HisPtpyeSync();
             hisPtpyeSync.setHpsId(SnowflakeUtil.getNum().toString());

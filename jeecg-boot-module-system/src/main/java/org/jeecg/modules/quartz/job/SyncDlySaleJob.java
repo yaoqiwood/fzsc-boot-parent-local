@@ -3,7 +3,7 @@ package org.jeecg.modules.quartz.job;
 import java.io.IOException;
 
 import org.jeecg.modules.gwb.entity.HisPtpyeSync;
-import org.jeecg.modules.gwb.service.IGoodsStocksService;
+import org.jeecg.modules.gwb.service.IDlySaleService;
 import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,15 +14,15 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class SyncGoodsStockInfJob {
+public class SyncDlySaleJob {
 
-    private IGoodsStocksService goodsStocksService;
+    private IDlySaleService dlySaleService;
 
     private IHisPtpyeSyncService hisPtpyeSyncService;
 
     @Autowired
-    public void setGoodsStocksService(IGoodsStocksService goodsStocksService) {
-        this.goodsStocksService = goodsStocksService;
+    public void setDlySaleService(IDlySaleService dlySaleService) {
+        this.dlySaleService = dlySaleService;
     }
 
     @Autowired
@@ -34,12 +34,11 @@ public class SyncGoodsStockInfJob {
     @Scheduled(fixedRate = 1000 * 60 * 1)
     @Transactional(rollbackFor = Exception.class)
     void process() {
-        log.info("定时开始同步库存信息......");
         try {
-            HisPtpyeSync hisPtpyeSync = this.goodsStocksService.syncGoodsStocksInfFromServer();
+            HisPtpyeSync hisPtpyeSync = dlySaleService.syncDlySaleInfFromServer();
             this.hisPtpyeSyncService.save(hisPtpyeSync);
         } catch (IOException e) {
-            log.error("定时同步任务失败", e);
+            log.error("定时任务同步失败：", e);
         }
     }
 

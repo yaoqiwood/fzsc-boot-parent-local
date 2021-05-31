@@ -19,8 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Slf4j
 public class SampleTest {
 
     @Resource
@@ -49,6 +52,9 @@ public class SampleTest {
 
     @Autowired
     private IGoodsStocksService goodsStocksService;
+
+    @Autowired
+    private IDlySaleService dlySaleService;
 
     @Test
     public void testSelect() {
@@ -107,24 +113,28 @@ public class SampleTest {
         // }
     }
 
-    @Test
-    public void testGoodsStock() {
-
-        try {
-            this.goodsStocksService.syncGoodsStocksInfFromServer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // try {
-        // this.goodsStocksGlideService.syncTGoodsStocksInfFromServer();
-        // } catch (IOException e) {
-        // e.printStackTrace();
-        // }
-    }
+    // @Test
+    // public void testGoodsStock() {
+    //
+    // try {
+    // this.goodsStocksService.syncGoodsStocksInfFromServer();
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // }
+    //
+    // }
 
     // public static void main(String[] args) {
     // String str = "<<<<<asad>> &a&& 'b' \"111";
     // System.out.println(XMLTransferUtil.transferXML(str));
+    // }
+
+    // @Test
+    // public void testDlySaleInfSync() {
+    // try {
+    // dlySaleService.syncDlySaleInfFromServer();
+    // } catch (IOException e) {
+    // log.error("error:", e);
+    // }
     // }
 }

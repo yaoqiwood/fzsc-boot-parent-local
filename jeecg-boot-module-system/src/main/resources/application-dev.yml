@@ -220,10 +220,12 @@ swagger:
 ptype:
   getSyncMaxUpdateTagFromServerUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/getSyncMaxUpdateTagFromServer
   getSyncMaxUpdateDateFromServerUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/getSyncMaxUpdateDateFromServer
-  remoteSearchMaxVchCodeUrl: http://localhost:8080/jeecg-boot/gwb/goodsStocksApi/remoteSearchMaxVchCode
+  remoteSearchMaxSaveTimeUrl: http://localhost:8080/jeecg-boot/gwb/goodsStocksApi/remoteSearchMaxSaveTime
+  remoteSearchMaxDlySaleVchcodeUrl: http://localhost:8080/jeecg-boot/gwb/DlySaleSyncApi/getMaxDlySaleVchcode
   postDataUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/syncPtypeInfFromLocal
   pricePostDataUrl: http://localhost:8080/jeecg-boot/gwb/ptypeSyncApi/syncPtypePriceInfFromLocal
   syncGoodsStocksFromLocalUrl: http://localhost:8080/jeecg-boot/gwb/goodsStocksApi/syncGoodsStocksFromLocal
+  syncDlySaleFromLocalUrl: http://localhost:8080/jeecg-boot/gwb/DlySaleSyncApi/syncDlySaleFromLocal
   filter:
     check:
       public:
