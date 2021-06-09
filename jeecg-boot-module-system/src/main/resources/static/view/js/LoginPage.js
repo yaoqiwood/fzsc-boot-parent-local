@@ -1,4 +1,4 @@
-var basicPrefix = HTTP + BAISC_URL + BAISC_CONTEXT;
+var basicPrefix = HTTP + BASIC_URL + BASIC_CONTEXT;
 var imgSrc = basicPrefix + "/sys/randomImage/";
 var loginUrl = basicPrefix + '/sys/login';
 var randomKey = Math.random();

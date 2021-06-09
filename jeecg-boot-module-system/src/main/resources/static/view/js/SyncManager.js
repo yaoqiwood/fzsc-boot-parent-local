@@ -1,5 +1,6 @@
-const initSyncInfRecordUrl = HTTP + BAISC_URL + BAISC_CONTEXT + '/ptype/initPtypeSyncPage';
-const hisPtypeSyncTableRecordUrl = HTTP + BAISC_URL + BAISC_CONTEXT + '/hisPtypeSync/data-grid.json';
+const initSyncInfRecordUrl = HTTP + BASIC_URL + BASIC_CONTEXT + '/ptype/initPtypeSyncPage';
+const hisPtypeSyncTableRecordUrl = HTTP + BASIC_URL + BASIC_CONTEXT + '/hisPtypeSync/data-grid.json';
+const changeAllE2CATNameUrl = HTTP + BASIC_URL + BASIC_CONTEXT + '/ptype/changeAllE2CATName'
 let pageParams = {
     pageNo: 0,
     pageSize: 5,
@@ -107,4 +108,20 @@ function initSyncInfRecord() {
             $(location).attr("href", "./LoginPage.html")
         }
     })
+}
+
+function changeAllE2CATName() {
+    if (confirm("确定是否要更改所有相关品名？")) {
+        $.ajax({
+            url: changeAllE2CATNameUrl,
+            contentType: "application/json;charset=UTF-8",
+            headers: {
+                "X-Access-Token": localStorage.getItem("token")
+            },
+            type: 'post',
+            success(resp) {
+                alert(resp.message)
+            }
+        })
+    }
 }

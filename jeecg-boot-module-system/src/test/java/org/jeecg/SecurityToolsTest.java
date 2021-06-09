@@ -48,7 +48,10 @@ public class SecurityToolsTest {
         System.out.println(new JSONObject(securityResp).toStringPretty());
     }
 
-    public static void main(String[] args) {
-        System.out.println(String.valueOf(true));
-    }
+    // public static void main(String[] args) {
+    // System.out.println(String.valueOf(true));
+    // }
+    // public static void main(String[] args) {
+    // System.out.println(PingYinUtil.getFirstSpell("行走"));
+    // }
 }

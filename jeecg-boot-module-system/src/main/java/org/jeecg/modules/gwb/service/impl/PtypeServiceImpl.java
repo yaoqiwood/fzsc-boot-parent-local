@@ -10,6 +10,7 @@ import org.jeecg.common.enumerate.EnumSyncPtypeStatus;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.util.HTTPUtil;
 import org.jeecg.common.util.HttpXmlBuilderUtil;
+import org.jeecg.common.util.PingYinUtil;
 import org.jeecg.common.util.SnowflakeUtil;
 import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 import org.jeecg.modules.gwb.entity.Ptype;
@@ -58,6 +59,7 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
 
     /**
      * syncSendPtypeInfData2Server
+     *
      * @return
      * @throws IOException
      */
@@ -100,6 +102,27 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
                 reader.close();
             }
         }
+    }
+
+    @DS("multi-datasource-gwb")
+    @Override
+    public Integer changeAllE2CATName() {
+        List<Ptype> ptypeList = this.baseMapper.findContainENamePtype();
+        Integer size = 0;
+        for (Ptype ptype : ptypeList) {
+            Ptype ptype4Update = new Ptype();
+            String name = ptype.getPfullname();
+            String replaceName = name.replaceAll("E", "CAT");
+            replaceName = replaceName.replaceAll("e", "CAT");
+            ptype4Update.setPtypeid(ptype.getPtypeid());
+            ptype4Update.setPfullname(replaceName);
+            ptype4Update.setPnamepy(PingYinUtil.getFirstSpell(replaceName));
+            QueryWrapper<Ptype> queryWrapper = new QueryWrapper<>();
+            queryWrapper.lambda().eq(Ptype::getPtypeid, ptype4Update.getPtypeid());
+            this.baseMapper.update(ptype4Update, queryWrapper);
+            size++;
+        }
+        return size;
     }
 
     private String httpGetSyncMethodFromServer(String url, BufferedReader reader) throws IOException {

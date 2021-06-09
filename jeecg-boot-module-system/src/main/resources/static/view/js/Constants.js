@@ -1,3 +1,3 @@
 const HTTP = 'http://';
-const BAISC_URL = "localhost:10086";
-const BAISC_CONTEXT = "/jeecg-boot-local";
+const BASIC_URL = "localhost:10086";
+const BASIC_CONTEXT = "/jeecg-boot-local";

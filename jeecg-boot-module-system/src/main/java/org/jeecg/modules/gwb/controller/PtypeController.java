@@ -20,9 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 public class PtypeController extends JeecgController<Ptype, IPtypeService> {
 
     @Autowired
-    private IPtypeService ptypeService;
-
-    @Autowired
     private IXwPPtypePriceService xwPPtypePriceService;
 
     @Autowired
@@ -36,7 +33,7 @@ public class PtypeController extends JeecgController<Ptype, IPtypeService> {
     public Result<?> syncSendPtypeInfData2Server() { // @RequestParam("updateTag") Integer updateTag
         try {
             // Integer updateTag = hisPtpyeSyncService.selectMaxUpdateTag();
-            HisPtpyeSync hisPtpyeSync = ptypeService.syncSendPtypeInfData2Server();
+            HisPtpyeSync hisPtpyeSync = this.service.syncSendPtypeInfData2Server();
             hisPtpyeSyncService.save(hisPtpyeSync);
             return Result.ok("同步商品信息成功");
         } catch (Exception e) {
@@ -74,4 +71,15 @@ public class PtypeController extends JeecgController<Ptype, IPtypeService> {
             return Result.error(e.getMessage());
         }
     }
+
+    /**
+     * changeAllE2CATName
+     * @return
+     */
+    @PostMapping({ "changeAllE2CATName" })
+    public Result<?> changeAllE2CATName() {
+        Integer size = this.service.changeAllE2CATName();
+        return Result.ok("变更成功，共变更： " + size + " 条数据！");
+    }
+
 }

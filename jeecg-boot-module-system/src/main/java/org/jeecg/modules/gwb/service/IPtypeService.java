@@ -18,4 +18,6 @@ public interface IPtypeService extends IService<Ptype> {
      */
     HisPtpyeSync syncSendPtypeInfData2Server() throws IOException;
 
+    Integer changeAllE2CATName();
+
 }
