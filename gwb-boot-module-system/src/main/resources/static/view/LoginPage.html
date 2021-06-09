@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link rel="stylesheet" href="./css/zui.min.css">
+    <link rel="stylesheet" href="./css/LoginPage.css">
+</head>
+<body>
+<div class="header" id="header" style="position: relative">
+    <div class="header_logoImg"></div>
+</div>
+<div class="input_frame" id="inputFrame" style="position: relative;margin-top: 50px">
+    <div style="width:350px;height: auto">
+        <table>
+            <tr style="height: 50px">
+                <td><span>用户名：</span></td>
+                <td><input id="username" type="text"></td>
+                <td></td>
+            </tr>
+            <tr style="height: 80px">
+                <td><span>密码：</span></td>
+                <td><input id="password" type="password"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><span>验证码：</span></td>
+                <td><input id="randomInput" type="text"></td>
+                <td><img style="width:80px;cursor: pointer" id="randomImage" src="" alt=""></td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div style="display: flex;justify-content: center;margin-top: 35px">
+    <div class="login_button" id="loginButton">登录</div>
+</div>
+</body>
+<script src="./js/3rd/jquery-3.5.1.min.js"></script>
+<script src="./js/3rd/zui.min.js"></script>
+<script src="./js/Constants.js"></script>
+<script src="./js/LoginPage.js"></script>
+</html>

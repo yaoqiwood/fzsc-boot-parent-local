@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.gwb.mapper.GoodsStocksMapper">
+    <resultMap id="goodsStockResultMap" type="org.jeecg.modules.gwb.entity.dto.GoodsStockDto">
+        <result property="vchcode" column="Vchcode"/>
+        <result property="date" column="Date"/>
+        <result property="vchType" column="VchType"/>
+        <result property="savedate" column="Savedate"/>
+        <result property="ptypeid" column="ptypeid"/>
+        <result property="tQty" column="TQty"/>
+        <result property="tPrice" column="TPrice"/>
+        <result property="gPrice" column="GPrice"/>
+        <result property="gTotal" column="GTotal"/>
+        <result property="qty" column="Qty"/>
+    </resultMap>
+
+    <select id="searchGoodsStocksUpdateInf" resultType="org.jeecg.modules.gwb.entity.dto.GoodsStockDto">
+        SELECT D.Vchcode,
+               D.[Date] AS Date,
+            D.VchType,
+            D.Savedate,
+            A.ptypeid,
+            A.Qty AS TQty,
+            A.Price AS TPrice,
+            G.Price AS GPrice,
+            G.Total AS GTotal,
+            CASE WHEN G.Qty IS NULL THEN 0 ELSE G.Qty
+        END
+        AS Qty
+        FROM
+            Dlyndx D
+            LEFT JOIN T_GoodsStocksGlide A
+        ON D.Vchcode = A.VchCode
+            LEFT JOIN GoodsStocks G ON A.ptypeid = G.PtypeId
+        WHERE
+            (
+            D.VchType = '6'
+           OR D.VchType = '9'
+           OR D.VchType = '11'
+           OR D.VchType = '14'
+           OR D.VchType = '16'
+           OR D.VchType = '34'
+           OR D.VchType = '45'
+            )
+          AND A.GoodsID IS NOT NULL
+          AND D.Savedate
+         &gt;
+        #{maxSaveDate}
+        ORDER
+        BY
+        D
+        .
+        Savedate
+        DESC
+    </select>
+</mapper>
+
