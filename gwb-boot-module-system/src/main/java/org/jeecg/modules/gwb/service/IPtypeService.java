@@ -4,7 +4,10 @@ import java.io.IOException;
 
 import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 import org.jeecg.modules.gwb.entity.Ptype;
+import org.jeecg.modules.gwb.entity.dto.ViewPtypeStockDto;
 
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 public interface IPtypeService extends IService<Ptype> {
@@ -20,4 +23,5 @@ public interface IPtypeService extends IService<Ptype> {
 
     Integer changeAllE2CATName();
 
+    Page<ViewPtypeStockDto> viewSearchStockPtypeOverall(JSONObject params);
 }

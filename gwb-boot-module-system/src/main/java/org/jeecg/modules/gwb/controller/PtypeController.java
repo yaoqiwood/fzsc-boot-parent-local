@@ -9,8 +9,11 @@ import org.jeecg.modules.gwb.service.IPtypeService;
 import org.jeecg.modules.gwb.service.IXwPPtypePriceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.fastjson.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,6 +83,16 @@ public class PtypeController extends JeecgController<Ptype, IPtypeService> {
     public Result<?> changeAllE2CATName() {
         Integer size = this.service.changeAllE2CATName();
         return Result.ok("变更成功，共变更： " + size + " 条数据！");
+    }
+
+    /**
+     * viewSearchStockPtypeOverall
+     * @param params
+     * @return
+     */
+    @PostMapping({ "viewSearchStockPtypeOverall" })
+    public Result<?> viewSearchStockPtypeOverall(@RequestBody JSONObject params) {
+        return Result.ok(this.service.viewSearchStockPtypeOverall(params));
     }
 
 }

@@ -10,6 +10,7 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.constant.DefConstants;
+import org.jeecg.common.enumerate.EnumRedisKeyType;
 import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.exceptions.ClientException;
+import com.google.common.base.Strings;
 
 import cn.hutool.core.util.RandomUtil;
 import io.swagger.annotations.Api;
@@ -65,7 +67,7 @@ public class LoginController {
 
     @ApiOperation("登录接口")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public Result<JSONObject> login(@RequestBody SysLoginModel sysLoginModel) {
+    public Result<JSONObject> login(HttpServletRequest request, @RequestBody SysLoginModel sysLoginModel) {
         Result<JSONObject> result = new Result<JSONObject>();
         String username = sysLoginModel.getUsername();
         String password = sysLoginModel.getPassword();
@@ -77,18 +79,30 @@ public class LoginController {
         // update-begin--Author:scott Date:20190805 for：暂时注释掉密码加密逻辑，有点问题
 
         // update-begin-author:taoyan date:20190828 for:校验验证码
+        Integer tryLoginCount = (Integer) redisUtil.get(username + EnumRedisKeyType.USERNAME_KEY.getCode());
+        if (null == tryLoginCount) {
+            tryLoginCount = 0;
+            redisUtil.set(username + EnumRedisKeyType.USERNAME_KEY.getCode(), tryLoginCount);
+            redisUtil.expire(username + EnumRedisKeyType.USERNAME_KEY.getCode(), 30 * 60 * 60);
+        }
+
         String captcha = sysLoginModel.getCaptcha();
-        if (captcha == null) {
-            result.error500("验证码无效");
-            return result;
+        if (tryLoginCount > 3) {
+            redisUtil.set(request.getRemoteHost() + EnumRedisKeyType.IP_CAPTCHA_KEY.getCode(), true);
+            redisUtil.expire(request.getRemoteHost() + EnumRedisKeyType.IP_CAPTCHA_KEY.getCode(), 30 * 60 * 60);
+            if (captcha == null) {
+                result.error500("验证码无效");
+                return result;
+            }
+            String lowerCaseCaptcha = captcha.toLowerCase();
+            String realKey = MD5Util.MD5Encode(lowerCaseCaptcha + sysLoginModel.getCheckKey(), "utf-8");
+            Object checkCode = redisUtil.get(realKey);
+            if (checkCode == null || !checkCode.equals(lowerCaseCaptcha)) {
+                result.error500("验证码错误");
+                return result;
+            }
         }
-        String lowerCaseCaptcha = captcha.toLowerCase();
-        String realKey = MD5Util.MD5Encode(lowerCaseCaptcha + sysLoginModel.getCheckKey(), "utf-8");
-        Object checkCode = redisUtil.get(realKey);
-        if (checkCode == null || !checkCode.equals(lowerCaseCaptcha)) {
-            result.error500("验证码错误");
-            return result;
-        }
+
         // update-end-author:taoyan date:20190828 for:校验验证码
 
         // 1. 校验用户是否有效
@@ -102,14 +116,19 @@ public class LoginController {
         String userpassword = PasswordUtil.encrypt(username, password, sysUser.getSalt());
         String syspassword = sysUser.getPassword();
         if (!syspassword.equals(userpassword)) {
+            tryLoginCount++;
+            redisUtil.set(username + EnumRedisKeyType.USERNAME_KEY.getCode(), tryLoginCount);
+            redisUtil.expire(username + EnumRedisKeyType.USERNAME_KEY.getCode(), 30 * 60 * 60);
             result.error500("用户名或密码错误");
             return result;
         }
-
+        redisUtil.del(request.getRemoteHost() + EnumRedisKeyType.IP_CAPTCHA_KEY.getCode());
+        redisUtil.del(username + EnumRedisKeyType.USERNAME_KEY.getCode());
         // 用户登录信息
-        userInfo(sysUser, result);
+        this.sysUserService.userInfo(sysUser, result);
         sysBaseAPI.addLog("用户名: " + username + ",登录成功！", CommonConstant.LOG_TYPE_1, null);
-
+        result.setMessage("登陆成功");
+        result.getResult().put("message", "登陆成功");
         return result;
     }
 
@@ -325,46 +344,10 @@ public class LoginController {
             return result;
         }
         // 用户信息
-        userInfo(sysUser, result);
+        this.sysUserService.userInfo(sysUser, result);
         // 添加日志
         sysBaseAPI.addLog("用户名: " + sysUser.getUsername() + ",登录成功！", CommonConstant.LOG_TYPE_1, null);
 
-        return result;
-    }
-
-    /**
-     * 用户信息
-     *
-     * @param sysUser
-     * @param result
-     * @return
-     */
-    private Result<JSONObject> userInfo(SysUser sysUser, Result<JSONObject> result) {
-        String syspassword = sysUser.getPassword();
-        String username = sysUser.getUsername();
-        // 生成token
-        String token = JwtUtil.sign(username, syspassword);
-        // 设置token缓存有效时间
-        redisUtil.set(CommonConstant.PREFIX_USER_TOKEN + token, token);
-        redisUtil.expire(CommonConstant.PREFIX_USER_TOKEN + token, JwtUtil.EXPIRE_TIME * 2 / 1000);
-
-        // 获取用户部门信息
-        JSONObject obj = new JSONObject();
-        List<SysDepart> departs = sysDepartService.queryUserDeparts(sysUser.getId());
-        obj.put("departs", departs);
-        if (departs == null || departs.size() == 0) {
-            obj.put("multi_depart", 0);
-        } else if (departs.size() == 1) {
-            sysUserService.updateUserDepart(username, departs.get(0).getOrgCode());
-            obj.put("multi_depart", 1);
-        } else {
-            obj.put("multi_depart", 2);
-        }
-        obj.put("token", token);
-        obj.put("userInfo", sysUser);
-        obj.put("sysAllDictItems", sysDictService.queryAllDictItems());
-        result.setResult(obj);
-        result.success("登录成功");
         return result;
     }
 
@@ -389,9 +372,21 @@ public class LoginController {
      */
     @ApiOperation("获取验证码")
     @GetMapping(value = "/randomImage/{key}")
-    public Result<String> randomImage(HttpServletResponse response, @PathVariable String key) {
+    public Result<String> randomImage(HttpServletRequest request, HttpServletResponse response,
+            @PathVariable String key) {
         Result<String> res = new Result<String>();
         try {
+            String remoteIP = request.getRemoteHost();
+            String ipCapt = remoteIP + EnumRedisKeyType.IP_CAPTCHA_KEY.getCode();
+            if (Strings.isNullOrEmpty(String.valueOf(redisUtil.get(ipCapt)))) {
+                redisUtil.set(ipCapt, false);
+                redisUtil.expire(ipCapt, 30 * 60 * 60);
+            }
+            if (redisUtil.get(ipCapt) == null || !(boolean) redisUtil.get(ipCapt)) {
+                res.setSuccess(true);
+                res.setResult(null);
+                return res;
+            }
             String code = RandomUtil.randomString(BASE_CHECK_CODES, 4);
             String lowerCaseCode = code.toLowerCase();
             String realKey = MD5Util.MD5Encode(lowerCaseCode + key, "utf-8");

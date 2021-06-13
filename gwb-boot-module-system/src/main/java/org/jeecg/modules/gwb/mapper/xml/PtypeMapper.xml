@@ -10,4 +10,73 @@
           AND A.pfullname NOT LIKE '%[0-9]E%'
           AND A.pfullname NOT LIKE '%[0-9,a-z]-E[0-9,a-z]%'
     </select>
+
+    <resultMap id="viewResultPtypeStock" type="org.jeecg.modules.gwb.entity.dto.ViewPtypeStockDto">
+        <result column="ptypeid" property="ptypeid"/>
+        <result column="pfullname" property="pfullname"/>
+        <result column="type" property="type"/>
+        <result column="qty" property="qty"/>
+        <result column="unit1" property="unit"/>
+        <result column="draftCount" property="draftCount"/>
+        <result column="saleCount" property="saleCount"/>
+    </resultMap>
+
+    <select id="viewSearchStockPtypeOverall" resultMap="viewResultPtypeStock">
+        SELECT *
+        FROM (
+        SELECT TOP ${pageSize} *
+        FROM (
+        SELECT TOP ${pageNoMSize} P.ptypeid,
+        P.pfullname,
+        P.type,
+        G.Qty,
+        PU.unit1,
+        (SELECT COUNT(0)
+        FROM Dlyndx A
+        LEFT JOIN BakDly D ON A.Vchcode = D.Vchcode
+        LEFT JOIN ptype PD ON D.PTYPEID = PD.ptypeid
+        WHERE D.ptypeid = P.ptypeid
+        AND A.Draft = 1) AS DraftCount,
+        (SELECT COUNT(0)
+        FROM Dlyndx A
+        LEFT JOIN DlySale DS ON A.Vchcode = DS.Vchcode
+        LEFT JOIN ptype PS ON DS.PtypeId = PS.ptypeid
+        WHERE A.Savedate BETWEEN #{saleDateBegin} AND #{saleDateEnd}
+        AND PS.ptypeid = P.ptypeid) AS SaleCount
+        FROM ptype P
+        LEFT JOIN GoodsStocks G ON P.ptypeid = G.PtypeId
+        LEFT JOIN xw_PtypeUnit PU ON P.ptypeid = PU.ptypeid
+        WHERE PU.IsBase = 1 AND P.soncount = 0
+        <if test="viewDeleted != null and viewDeleted != ''">
+            AND P.deleted != 1
+        </if>
+        <if test="viewStop != null and viewStop != ''">
+            AND P.isStop != 1
+        </if>
+        <if test="searchParams != null and searchParams != ''">
+            ${searchParams}
+        </if>
+        ) S
+        ORDER BY S.ptypeid ASC
+        ) SS
+        ORDER BY SS.ptypeid DESC
+    </select>
+
+
+    <select id="countSearchStockPtypeOverall" resultType="long">
+        SELECT COUNT(0)
+        FROM ptype P
+        LEFT JOIN GoodsStocks G ON P.ptypeid = G.PtypeId
+        LEFT JOIN xw_PtypeUnit PU ON P.ptypeid = PU.ptypeid
+        WHERE PU.IsBase = 1 AND P.soncount = 0
+        <if test="viewDeleted != null and viewDeleted != ''">
+            AND P.deleted != 1
+        </if>
+        <if test="viewStop != null and viewStop != ''">
+            AND P.isStop != 1
+        </if>
+        <if test="searchParams != null and searchParams != ''">
+            ${searchParams}
+        </if>
+    </select>
 </mapper>

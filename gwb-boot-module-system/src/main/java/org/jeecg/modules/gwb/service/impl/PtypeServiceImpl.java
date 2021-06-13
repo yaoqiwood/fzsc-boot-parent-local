@@ -8,12 +8,10 @@ import java.util.Map;
 
 import org.jeecg.common.enumerate.EnumSyncPtypeStatus;
 import org.jeecg.common.exception.JeecgBootException;
-import org.jeecg.common.util.HTTPUtil;
-import org.jeecg.common.util.HttpXmlBuilderUtil;
-import org.jeecg.common.util.PingYinUtil;
-import org.jeecg.common.util.SnowflakeUtil;
+import org.jeecg.common.util.*;
 import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 import org.jeecg.modules.gwb.entity.Ptype;
+import org.jeecg.modules.gwb.entity.dto.ViewPtypeStockDto;
 import org.jeecg.modules.gwb.mapper.PtypeMapper;
 import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.jeecg.modules.gwb.service.IPtypeService;
@@ -22,8 +20,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.base.Strings;
 
@@ -125,6 +125,56 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
         return size;
     }
 
+    /**
+     * viewSearchStockPtypeOverall
+     * @param params
+     * @return
+     */
+    @DS("multi-datasource-gwb")
+    @Override
+    public Page<ViewPtypeStockDto> viewSearchStockPtypeOverall(JSONObject params) {
+        Integer pageNo = params.getInteger("pageNo");
+        Integer pageSize = params.getInteger("pageSize");
+        String saleDateBegin = MikkoDateUtils.getBefore7DaysBeginTime();
+        String saleDateEnd = MikkoDateUtils.getNowTime();
+        if (!Strings.isNullOrEmpty(params.getString("saleDateBegin"))) {
+            saleDateBegin = params.getString("saleDateBegin");
+        }
+        if (!Strings.isNullOrEmpty(params.getString("saleDateEnd"))) {
+            saleDateEnd = params.getString("saleDateEnd");
+        }
+
+        String viewDeleted = "";
+        String viewStop = "";
+        if (!Strings.isNullOrEmpty(params.getString("viewDeleted"))) {
+            viewDeleted = params.getString("viewDeleted");
+        }
+        if (!Strings.isNullOrEmpty(params.getString("viewStop"))) {
+            viewStop = params.getString("viewStop");
+        }
+
+        String insertSql = "";
+        if (!Strings.isNullOrEmpty(params.getString("params"))) {
+            String paramsStr = params.getJSONArray("params").toJSONString();
+            List<String> paramsArray = JSONArray.parseArray(paramsStr, String.class);
+            insertSql = this.sqlTemplateRet(paramsArray);
+        }
+        List<ViewPtypeStockDto> viewPtypeStockDtoList = this.baseMapper.viewSearchStockPtypeOverall(pageSize,
+                pageNo * pageSize, saleDateBegin, saleDateEnd, viewDeleted, viewStop, insertSql);
+        long count = this.baseMapper.countSearchStockPtypeOverall(viewDeleted, viewStop, insertSql);
+        for (ViewPtypeStockDto item : viewPtypeStockDtoList) {
+            if (item.getQty() == null) {
+                item.setQty(0);
+            }
+        }
+        Page<ViewPtypeStockDto> page = new Page<>();
+        page.setRecords(viewPtypeStockDtoList);
+        page.setPages(count / pageSize);
+        page.setSize(pageSize);
+        page.setCurrent(pageNo);
+        return page;
+    }
+
     private String httpGetSyncMethodFromServer(String url, BufferedReader reader) throws IOException {
         log.info("发送URL:" + url);
         String builder = HTTPUtil.httpPostMethod(url, filterCheckPublicKey, "", reader);
@@ -139,8 +189,15 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
         return retMessageMap.get("response_return_data").toString();
     }
 
-    // @DS("master")
-    // private void saveHisInf(HisPtpyeSync hisPtpyeSync4Save) {
-    // hisPtpyeSyncService.save(hisPtpyeSync4Save);
-    // }
+    private String sqlTemplateRet(List<String> advancedSearch) {
+        String sqlTemplate = " AND (P.pfullname LIKE '%#searchParam#%' OR P.pnamepy LIKE '%#searchParam#%' OR P.type LIKE '%#searchParam#%' ) ";
+        StringBuilder joinSql = new StringBuilder();
+        for (String param : advancedSearch) {
+            if (!Strings.isNullOrEmpty(param)) {
+                joinSql.append(sqlTemplate.replaceAll("#searchParam#", param));
+            }
+        }
+        return joinSql.toString();
+    }
+
 }
