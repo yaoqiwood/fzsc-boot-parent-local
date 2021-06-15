@@ -172,6 +172,7 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
         page.setPages(count / pageSize);
         page.setSize(pageSize);
         page.setCurrent(pageNo);
+        page.setTotal(count);
         return page;
     }
 

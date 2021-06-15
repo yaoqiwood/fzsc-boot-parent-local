@@ -14,6 +14,7 @@
     <resultMap id="viewResultPtypeStock" type="org.jeecg.modules.gwb.entity.dto.ViewPtypeStockDto">
         <result column="ptypeid" property="ptypeid"/>
         <result column="pfullname" property="pfullname"/>
+        <result column="pusercode" property="pusercode"/>
         <result column="type" property="type"/>
         <result column="qty" property="qty"/>
         <result column="unit1" property="unit"/>
@@ -28,6 +29,7 @@
         FROM (
         SELECT TOP ${pageNoMSize} P.ptypeid,
         P.pfullname,
+        P.pusercode,
         P.type,
         G.Qty,
         PU.unit1,
@@ -47,19 +49,20 @@
         LEFT JOIN GoodsStocks G ON P.ptypeid = G.PtypeId
         LEFT JOIN xw_PtypeUnit PU ON P.ptypeid = PU.ptypeid
         WHERE PU.IsBase = 1 AND P.soncount = 0
-        <if test="viewDeleted != null and viewDeleted != ''">
-            AND P.deleted != 1
-        </if>
-        <if test="viewStop != null and viewStop != ''">
-            AND P.isStop != 1
-        </if>
+        AND (P.deleted = 0
+        <if test='viewDeleted != null and viewDeleted == "1"'>
+            OR P.deleted = #{viewDeleted}
+        </if>)
+        AND (P.isStop = 0
+        <if test='viewStop != null and viewStop == "1"'>
+            OR P.isStop != #{viewDeleted}
+        </if>)
         <if test="searchParams != null and searchParams != ''">
             ${searchParams}
         </if>
-        ) S
-        ORDER BY S.ptypeid ASC
+        ORDER BY P.ptypeid ASC
+        ) S ORDER BY S.ptypeid DESC
         ) SS
-        ORDER BY SS.ptypeid DESC
     </select>
 
 
@@ -69,12 +72,14 @@
         LEFT JOIN GoodsStocks G ON P.ptypeid = G.PtypeId
         LEFT JOIN xw_PtypeUnit PU ON P.ptypeid = PU.ptypeid
         WHERE PU.IsBase = 1 AND P.soncount = 0
-        <if test="viewDeleted != null and viewDeleted != ''">
-            AND P.deleted != 1
-        </if>
-        <if test="viewStop != null and viewStop != ''">
-            AND P.isStop != 1
-        </if>
+        AND (P.deleted = 0
+        <if test='viewDeleted != null and viewDeleted == "1"'>
+            OR P.deleted = #{viewDeleted}
+        </if>)
+        AND (P.isStop = 0
+        <if test='viewStop != null and viewStop != "1"'>
+            OR P.isStop != #{viewDeleted}
+        </if>)
         <if test="searchParams != null and searchParams != ''">
             ${searchParams}
         </if>
