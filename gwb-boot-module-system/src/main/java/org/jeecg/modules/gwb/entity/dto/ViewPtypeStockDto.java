@@ -19,4 +19,8 @@ public class ViewPtypeStockDto {
     private Integer draftCount;
 
     private Integer saleCount;
+
+    private Integer draftSum;
+
+    private Integer saleSum;
 }

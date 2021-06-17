@@ -6,12 +6,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.jeecg.common.enumerate.EnumMethodType;
 import org.jeecg.common.enumerate.EnumSyncPtypeStatus;
+import org.jeecg.common.enumerate.EnumVchType;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.util.*;
 import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 import org.jeecg.modules.gwb.entity.Ptype;
 import org.jeecg.modules.gwb.entity.dto.ViewPtypeStockDto;
+import org.jeecg.modules.gwb.entity.dto.ViewVchDraftQtyOrder;
+import org.jeecg.modules.gwb.entity.dto.ViewVchDraftQtyOrderDto;
 import org.jeecg.modules.gwb.mapper.PtypeMapper;
 import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.jeecg.modules.gwb.service.IPtypeService;
@@ -45,6 +49,10 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
 
     @Autowired
     private IHisPtpyeSyncService hisPtpyeSyncService;
+
+    private final String USED_TYPE_REDUCE = "1";
+
+    private final String USED_TYPE_PLUS = "2";
 
     @Override
     public void test() {
@@ -127,6 +135,7 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
 
     /**
      * viewSearchStockPtypeOverall
+     *
      * @param params
      * @return
      */
@@ -176,6 +185,54 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
         return page;
     }
 
+    @DS("multi-datasource-gwb")
+    @Override
+    public ViewPtypeStockDto findViewPtypeOverallByPtypeId(String ptypeid) {
+        ViewPtypeStockDto ptypeStockDto = this.baseMapper.findViewPtypeOverallByPtypeId(ptypeid);
+        List<ViewVchDraftQtyOrder> draftQtyOrderList = this.baseMapper.viewVchDraftQtyOrderById(ptypeid);
+        List<ViewVchDraftQtyOrder> dlySaleQtyOrderList = this.baseMapper.viewVchDlySaleQtyOrderByIdAndDate(
+                MikkoDateUtils.getBefore7DaysBeginTime(), MikkoDateUtils.getNowTime(), ptypeid);
+        System.out.println(MikkoDateUtils.getBefore7DaysBeginTime());
+        System.out.println(MikkoDateUtils.getNowTime());
+        Integer draftSum = 0;
+        Integer saleSum = 0;
+        for (ViewVchDraftQtyOrder draftQtyOrder : draftQtyOrderList) {
+            if (EnumMethodType.PLUS.getCode().equals(EnumVchType.getMethodByCode(draftQtyOrder.getVchType()))) {
+                draftSum += draftQtyOrder.getQty();
+            } else if (EnumMethodType.REDUCE.getCode()
+                    .equals(EnumVchType.getMethodByCode(draftQtyOrder.getVchType()))) {
+                draftSum -= draftQtyOrder.getQty();
+            } else {
+                switch (draftQtyOrder.getUsedtype()) {
+                case USED_TYPE_REDUCE:
+                    draftSum -= draftQtyOrder.getQty();
+                    break;
+                case USED_TYPE_PLUS:
+                    draftSum += draftQtyOrder.getQty();
+                    break;
+                }
+            }
+        }
+
+        for (ViewVchDraftQtyOrder saleQtyOrder : dlySaleQtyOrderList) {
+            saleSum += saleQtyOrder.getQty();
+        }
+
+        ptypeStockDto.setDraftSum(draftSum);
+        ptypeStockDto.setSaleSum(saleSum);
+        return ptypeStockDto;
+    }
+
+    @Override
+    public List<ViewVchDraftQtyOrderDto> findViewVchDraftQtyOrderDtoListByPtypeId(String ptypeid) {
+        List<ViewVchDraftQtyOrderDto> vchDraftQtyOrderDtoList = this.baseMapper
+                .findViewVchDraftQtyOrderDtoListByPtypeId(ptypeid);
+        for (ViewVchDraftQtyOrderDto viewVchDraftQtyOrderDto : vchDraftQtyOrderDtoList) {
+            viewVchDraftQtyOrderDto.setVchTypeName(EnumVchType.getMethodByCode(viewVchDraftQtyOrderDto.getVchType()));
+        }
+        return vchDraftQtyOrderDtoList;
+    }
+
     private String httpGetSyncMethodFromServer(String url, BufferedReader reader) throws IOException {
         log.info("发送URL:" + url);
         String builder = HTTPUtil.httpPostMethod(url, filterCheckPublicKey, "", reader);
@@ -191,7 +248,7 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
     }
 
     private String sqlTemplateRet(List<String> advancedSearch) {
-        String sqlTemplate = " AND (P.pfullname LIKE '%#searchParam#%' OR P.pnamepy LIKE '%#searchParam#%' OR P.type LIKE '%#searchParam#%' ) ";
+        String sqlTemplate = " AND (P.pfullname LIKE '%#searchParam#%' OR P.pnamepy LIKE '%#searchParam#%' OR P.type LIKE '%#searchParam#%' OR P.pusercode LIKE '%#searchParam#%') ";
         StringBuilder joinSql = new StringBuilder();
         for (String param : advancedSearch) {
             if (!Strings.isNullOrEmpty(param)) {

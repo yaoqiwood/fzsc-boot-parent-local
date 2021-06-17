@@ -8,10 +8,7 @@ import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.jeecg.modules.gwb.service.IPtypeService;
 import org.jeecg.modules.gwb.service.IXwPPtypePriceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -93,6 +90,26 @@ public class PtypeController extends JeecgController<Ptype, IPtypeService> {
     @PostMapping({ "viewSearchStockPtypeOverall" })
     public Result<?> viewSearchStockPtypeOverall(@RequestBody JSONObject params) {
         return Result.ok(this.service.viewSearchStockPtypeOverall(params));
+    }
+
+    /**
+     * findViewPtypeOverallByPtypeId
+     * @param ptypeid
+     * @return
+     */
+    @GetMapping({ "findViewPtypeOverallByPtypeId" })
+    public Result<?> findViewPtypeOverallByPtypeId(@RequestParam String ptypeid) {
+        return Result.ok(this.service.findViewPtypeOverallByPtypeId(ptypeid));
+    }
+
+    /**
+     * findViewVchDraftQtyOrderDtoListByPtypeId
+     * @param ptypeid
+     * @return
+     */
+    @GetMapping({ "findViewVchDraftQtyOrderDtoListByPtypeId" })
+    public Result<?> findViewVchDraftQtyOrderDtoListByPtypeId(@RequestParam String ptypeid) {
+        return Result.ok(this.findViewVchDraftQtyOrderDtoListByPtypeId(ptypeid));
     }
 
 }
