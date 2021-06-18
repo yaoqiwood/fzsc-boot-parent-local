@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 import org.jeecg.modules.gwb.entity.Ptype;
+import org.jeecg.modules.gwb.entity.dto.PtypeWareHouse;
 import org.jeecg.modules.gwb.entity.dto.ViewPtypeStockDto;
 import org.jeecg.modules.gwb.entity.dto.ViewVchDraftQtyOrderDto;
 import org.jeecg.modules.gwb.entity.dto.ViewVchSaleQtyOrderDto;
@@ -33,5 +34,7 @@ public interface IPtypeService extends IService<Ptype> {
     List<ViewVchDraftQtyOrderDto> findViewVchDraftQtyOrderDtoListByPtypeId(String ptypeid);
 
     List<ViewVchSaleQtyOrderDto> findViewVchSaleQtyOrderDtoListByPtypeId(String ptypeid);
+
+    Page<PtypeWareHouse> findWarehouseByNumRangeAndPage(JSONObject object);
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.gwb.entity.Ptype;
+import org.jeecg.modules.gwb.entity.dto.PtypeWareHouse;
 import org.jeecg.modules.gwb.entity.dto.ViewPtypeStockDto;
 import org.jeecg.modules.gwb.entity.dto.ViewVchDraftQtyOrder;
 import org.jeecg.modules.gwb.entity.dto.ViewVchDraftQtyOrderDto;
@@ -63,4 +64,24 @@ public interface PtypeMapper extends BaseMapper<Ptype> {
     List<ViewVchDraftQtyOrder> viewVchDlySaleQtyOrderByIdAndDate(@Param("dateBegin") String dateBegin,
             @Param("dateEnd") String dateEnd, @Param("ptypeid") String ptypeid);
 
+    /**
+     * findWarehouseByNumRange
+     * @param pageSize
+     * @param pageNoMSize
+     * @param lessThanQtyNum
+     * @param biggerThanQtyNum
+     * @return
+     */
+    List<PtypeWareHouse> findWarehouseByNumRange(@Param("pageSize") Integer pageSize,
+            @Param("pageNoMSize") Integer pageNoMSize, @Param("lessThanQtyNum") Integer lessThanQtyNum,
+            @Param("biggerThanQtyNum") Integer biggerThanQtyNum);
+
+    /**
+     * countWarehouseByNumRange
+     * @param lessThanQtyNum
+     * @param biggerThanQtyNum
+     * @return
+     */
+    Long countWarehouseByNumRange(@Param("lessThanQtyNum") Integer lessThanQtyNum,
+            @Param("biggerThanQtyNum") Integer biggerThanQtyNum);
 }

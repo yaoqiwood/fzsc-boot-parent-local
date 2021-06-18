@@ -14,10 +14,7 @@ import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.util.*;
 import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 import org.jeecg.modules.gwb.entity.Ptype;
-import org.jeecg.modules.gwb.entity.dto.ViewPtypeStockDto;
-import org.jeecg.modules.gwb.entity.dto.ViewVchDraftQtyOrder;
-import org.jeecg.modules.gwb.entity.dto.ViewVchDraftQtyOrderDto;
-import org.jeecg.modules.gwb.entity.dto.ViewVchSaleQtyOrderDto;
+import org.jeecg.modules.gwb.entity.dto.*;
 import org.jeecg.modules.gwb.mapper.PtypeMapper;
 import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.jeecg.modules.gwb.service.IPtypeService;
@@ -181,7 +178,7 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
         }
         Page<ViewPtypeStockDto> page = new Page<>();
         page.setRecords(viewPtypeStockDtoList);
-        page.setPages(count / pageSize);
+        page.setPages(count / pageSize + (count % pageSize > 0 ? 1 : 0));
         page.setSize(pageSize);
         page.setCurrent(pageNo);
         page.setTotal(count);
@@ -264,6 +261,36 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
             saleQtyOrderDtoList.add(saleQtyOrderDto);
         }
         return saleQtyOrderDtoList;
+    }
+
+    @DS("multi-datasource-gwb")
+    @Override
+    public Page<PtypeWareHouse> findWarehouseByNumRangeAndPage(JSONObject object) {
+        if (null == object.getInteger("pageNo") || null == object.getInteger("pageSize")) {
+            return new Page<>();
+        }
+        Integer pageNo = object.getInteger("pageNo");
+        Integer pageSize = object.getInteger("pageSize");
+        Integer lessThanQtyNum = 1;
+        Integer biggerThanQtyNum = null;
+        Integer pageNoMSize = pageNo * pageSize;
+        if (null != object.getInteger("lessThanQtyNum")) {
+            lessThanQtyNum = object.getInteger("lessThanQtyNum");
+        }
+        if (null != object.getInteger("biggerThanQtyNum")) {
+            biggerThanQtyNum = object.getInteger("biggerThanQtyNum");
+        }
+
+        List<PtypeWareHouse> wareHouseList = this.baseMapper.findWarehouseByNumRange(pageNoMSize, pageSize,
+                lessThanQtyNum, biggerThanQtyNum);
+        Long count = this.baseMapper.countWarehouseByNumRange(lessThanQtyNum, biggerThanQtyNum);
+        Page<PtypeWareHouse> wareHousePage = new Page<>();
+        wareHousePage.setRecords(wareHouseList);
+        wareHousePage.setTotal(count);
+        wareHousePage.setCurrent(pageNo);
+        wareHousePage.setSize(pageSize);
+        wareHousePage.setPages(count / pageSize + (count % pageSize > 0 ? 1 : 0));
+        return wareHousePage;
     }
 
     private String httpGetSyncMethodFromServer(String url, BufferedReader reader) throws IOException {

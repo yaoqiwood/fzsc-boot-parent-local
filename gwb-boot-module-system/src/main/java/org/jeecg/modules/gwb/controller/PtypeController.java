@@ -122,4 +122,14 @@ public class PtypeController extends JeecgController<Ptype, IPtypeService> {
         return Result.ok(this.service.findViewVchSaleQtyOrderDtoListByPtypeId(ptypeid));
     }
 
+    /**
+     * listWarehouseByNumRangeAndPage
+     * @param object
+     * @return
+     */
+    @PostMapping({ "listWarehouseByNumRangeAndPage" })
+    public Result<?> listWarehouseByNumRangeAndPage(@RequestBody JSONObject object) {
+        return Result.ok(this.service.findWarehouseByNumRangeAndPage(object));
+    }
+
 }

@@ -161,4 +161,52 @@
           AND A.Draft = 1
     </select>
 
+    <select id="findWarehouseByNumRange" resultType="org.jeecg.modules.gwb.entity.dto.PtypeWareHouse">
+        SELECT TOP ${pageSize} * FROM (
+        SELECT TOP ${pageNoMSize} P.PtypeId,
+        P.parId,
+        P.leveal,
+        P.pusercode,
+        P.pfullname,
+        P.type,
+        P.area,
+        P.pnamepy,
+        G.Qty,
+        XU.unit1
+        FROM ptype P
+        LEFT JOIN GoodsStocks G ON P.ptypeid = G.ptypeid
+        LEFT JOIN xw_PtypeUnit XU ON P.ptypeid =
+        XU.ptypeid
+        WHERE P.soncount = 0
+        AND P.isStop = 0
+        AND P.deleted = 0
+        AND XU.IsBase = 1
+        AND (
+        ( G.Qty &lt;= #{lessThanQtyNum} OR G.Qty IS NULL )
+        <if test="biggerThanQtyNum != null and biggerThanQtyNum != ''">
+            AND G.Qty &gt;= #{biggerThanQtyNum}
+        </if>
+        )
+        ORDER BY P.ptypeid ASC ) S
+        ORDER BY S.ptypeid DESC
+    </select>
+
+    <select id="countWarehouseByNumRange" resultType="java.lang.Long">
+        SELECT COUNT(0)
+        FROM ptype P
+        LEFT JOIN GoodsStocks G ON P.ptypeid = G.ptypeid
+        LEFT JOIN xw_PtypeUnit XU ON P.ptypeid =
+        XU.ptypeid
+        WHERE P.soncount = 0
+        AND P.isStop = 0
+        AND P.deleted = 0
+        AND XU.IsBase = 1
+        AND (
+        ( G.Qty &lt;= #{lessThanQtyNum} OR G.Qty IS NULL )
+        <if test="biggerThanQtyNum != null and biggerThanQtyNum != ''">
+            AND G.Qty &gt;= #{biggerThanQtyNum}
+        </if>
+        )
+    </select>
+
 </mapper>
