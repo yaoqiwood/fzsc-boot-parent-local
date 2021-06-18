@@ -16,6 +16,14 @@ public enum EnumVchType {
 
     private String method;
 
+    private static final String USED_TYPE_REDUCE = "1";
+
+    private static final String USED_TYPE_PLUS = "2";
+
+    private static final String OUT_WAREHOUSE = "出库";
+
+    private static final String IN_WAREHOUSE = "入库";
+
     EnumVchType(String name, String code, String method) {
         this.name = name;
         this.code = code;
@@ -27,6 +35,38 @@ public enum EnumVchType {
             if (value.getCode().equals(type)) {
                 return value.getMethod();
             }
+        }
+        return null;
+    }
+
+    public static String getNameByCode(String type) {
+        for (EnumVchType value : EnumVchType.values()) {
+            if (value.getCode().equals(type)) {
+                return value.getName();
+            }
+        }
+        return null;
+    }
+
+    public static String getPlusOrReduceName(String type) {
+        for (EnumVchType value : EnumVchType.values()) {
+            if (value.getCode().equals(type)) {
+                if (EnumVchType.PURCHASE.getMethod().equals(value.getMethod())) {
+                    return IN_WAREHOUSE;
+                } else if (EnumVchType.SALE.getMethod().equals(value.getMethod())) {
+                    return OUT_WAREHOUSE;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static String getUsedTypeName(String usedType) {
+        switch (usedType) {
+        case USED_TYPE_REDUCE:
+            return "拆（出库）";
+        case USED_TYPE_PLUS:
+            return "装(入库）";
         }
         return null;
     }
