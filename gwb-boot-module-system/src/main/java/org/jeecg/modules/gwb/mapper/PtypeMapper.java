@@ -62,4 +62,5 @@ public interface PtypeMapper extends BaseMapper<Ptype> {
      */
     List<ViewVchDraftQtyOrder> viewVchDlySaleQtyOrderByIdAndDate(@Param("dateBegin") String dateBegin,
             @Param("dateEnd") String dateEnd, @Param("ptypeid") String ptypeid);
+
 }

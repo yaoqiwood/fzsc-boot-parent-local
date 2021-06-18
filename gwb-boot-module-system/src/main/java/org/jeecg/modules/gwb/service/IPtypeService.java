@@ -7,6 +7,7 @@ import org.jeecg.modules.gwb.entity.HisPtpyeSync;
 import org.jeecg.modules.gwb.entity.Ptype;
 import org.jeecg.modules.gwb.entity.dto.ViewPtypeStockDto;
 import org.jeecg.modules.gwb.entity.dto.ViewVchDraftQtyOrderDto;
+import org.jeecg.modules.gwb.entity.dto.ViewVchSaleQtyOrderDto;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -30,5 +31,7 @@ public interface IPtypeService extends IService<Ptype> {
     ViewPtypeStockDto findViewPtypeOverallByPtypeId(String ptypeid);
 
     List<ViewVchDraftQtyOrderDto> findViewVchDraftQtyOrderDtoListByPtypeId(String ptypeid);
+
+    List<ViewVchSaleQtyOrderDto> findViewVchSaleQtyOrderDtoListByPtypeId(String ptypeid);
 
 }

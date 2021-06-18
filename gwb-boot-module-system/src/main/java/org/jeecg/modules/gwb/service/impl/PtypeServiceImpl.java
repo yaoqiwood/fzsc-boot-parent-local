@@ -2,6 +2,7 @@ package org.jeecg.modules.gwb.service.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -16,9 +17,11 @@ import org.jeecg.modules.gwb.entity.Ptype;
 import org.jeecg.modules.gwb.entity.dto.ViewPtypeStockDto;
 import org.jeecg.modules.gwb.entity.dto.ViewVchDraftQtyOrder;
 import org.jeecg.modules.gwb.entity.dto.ViewVchDraftQtyOrderDto;
+import org.jeecg.modules.gwb.entity.dto.ViewVchSaleQtyOrderDto;
 import org.jeecg.modules.gwb.mapper.PtypeMapper;
 import org.jeecg.modules.gwb.service.IHisPtpyeSyncService;
 import org.jeecg.modules.gwb.service.IPtypeService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -203,7 +206,7 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
                     .equals(EnumVchType.getMethodByCode(draftQtyOrder.getVchType()))) {
                 draftSum -= draftQtyOrder.getQty();
             } else {
-                switch (draftQtyOrder.getUsedtype()) {
+                switch (draftQtyOrder.getUsedType()) {
                 case USED_TYPE_REDUCE:
                     draftSum -= draftQtyOrder.getQty();
                     break;
@@ -223,14 +226,44 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
         return ptypeStockDto;
     }
 
+    @DS("multi-datasource-gwb")
     @Override
     public List<ViewVchDraftQtyOrderDto> findViewVchDraftQtyOrderDtoListByPtypeId(String ptypeid) {
         List<ViewVchDraftQtyOrderDto> vchDraftQtyOrderDtoList = this.baseMapper
                 .findViewVchDraftQtyOrderDtoListByPtypeId(ptypeid);
         for (ViewVchDraftQtyOrderDto viewVchDraftQtyOrderDto : vchDraftQtyOrderDtoList) {
-            viewVchDraftQtyOrderDto.setVchTypeName(EnumVchType.getMethodByCode(viewVchDraftQtyOrderDto.getVchType()));
+            viewVchDraftQtyOrderDto.setVchTypeName(EnumVchType.getNameByCode(viewVchDraftQtyOrderDto.getVchType()));
+            // 检测当前是入库单亦或者出库单
+            viewVchDraftQtyOrderDto
+                    .setUsedTypeName(EnumVchType.getPlusOrReduceName(viewVchDraftQtyOrderDto.getVchType()));
+            // 检查是否拆装单
+            if (EnumVchType.DISASSEMBLE.getCode().equals(viewVchDraftQtyOrderDto.getVchType())) {
+                viewVchDraftQtyOrderDto
+                        .setUsedTypeName(EnumVchType.getUsedTypeName(viewVchDraftQtyOrderDto.getUsedType()));
+            }
         }
         return vchDraftQtyOrderDtoList;
+    }
+
+    @DS("multi-datasource-gwb")
+    @Override
+    public List<ViewVchSaleQtyOrderDto> findViewVchSaleQtyOrderDtoListByPtypeId(String ptypeid) {
+        List<ViewVchDraftQtyOrder> draftQtyOrderList = this.baseMapper.viewVchDlySaleQtyOrderByIdAndDate(
+                MikkoDateUtils.getBefore7DaysBeginTime(), MikkoDateUtils.getNowTime(), ptypeid);
+        List<ViewVchSaleQtyOrderDto> saleQtyOrderDtoList = new ArrayList<>();
+        for (ViewVchDraftQtyOrder draftQtyOrder : draftQtyOrderList) {
+            ViewVchSaleQtyOrderDto saleQtyOrderDto = new ViewVchSaleQtyOrderDto();
+            BeanUtils.copyProperties(draftQtyOrder, saleQtyOrderDto);
+            saleQtyOrderDto.setVchTypeName(EnumVchType.getNameByCode(saleQtyOrderDto.getVchType()));
+            // 检测当前是入库单亦或者出库单
+            saleQtyOrderDto.setUsedTypeName(EnumVchType.getPlusOrReduceName(saleQtyOrderDto.getVchType()));
+            // 检查是否拆装单
+            if (EnumVchType.DISASSEMBLE.getCode().equals(saleQtyOrderDto.getVchType())) {
+                saleQtyOrderDto.setUsedTypeName(EnumVchType.getUsedTypeName(saleQtyOrderDto.getUsedType()));
+            }
+            saleQtyOrderDtoList.add(saleQtyOrderDto);
+        }
+        return saleQtyOrderDtoList;
     }
 
     private String httpGetSyncMethodFromServer(String url, BufferedReader reader) throws IOException {
@@ -248,7 +281,7 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
     }
 
     private String sqlTemplateRet(List<String> advancedSearch) {
-        String sqlTemplate = " AND (P.pfullname LIKE '%#searchParam#%' OR P.pnamepy LIKE '%#searchParam#%' OR P.type LIKE '%#searchParam#%' OR P.pusercode LIKE '%#searchParam#%') ";
+        String sqlTemplate = " AND (P.pfullname LIKE '%#searchParam#%' OR P.pnamepy LIKE '%#searchParam#%' OR P.type LIKE '%#searchParam#%' OR P.pusercode LIKE '%#searchParam#%' OR P.ptypeid = '#searchParam#') ";
         StringBuilder joinSql = new StringBuilder();
         for (String param : advancedSearch) {
             if (!Strings.isNullOrEmpty(param)) {

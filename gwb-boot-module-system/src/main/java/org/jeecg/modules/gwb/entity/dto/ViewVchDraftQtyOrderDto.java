@@ -7,4 +7,6 @@ import lombok.EqualsAndHashCode;
 @Data
 public class ViewVchDraftQtyOrderDto extends ViewVchDraftQtyOrder {
     private String vchTypeName;
+
+    private String usedTypeName;
 }

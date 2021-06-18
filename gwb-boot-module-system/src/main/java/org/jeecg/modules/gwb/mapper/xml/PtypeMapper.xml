@@ -149,13 +149,16 @@
                A.VchType,
                A.summary,
                A.Comment,
-               DS.Qty,
+               D.Qty,
+               D.usedtype,
                P.ptypeid,
                P.pfullname
         FROM Dlyndx A
-                 LEFT JOIN DlySale DS ON A.Vchcode = DS.Vchcode
-                 LEFT JOIN ptype P ON DS.PtypeId = P.ptypeid
-        WHERE A.Savedate BETWEEN #{dateBegin} AND #{dateEnd}
-          AND P.ptypeid = #{ptypeid}
+                 LEFT JOIN BakDly D
+                           ON A.Vchcode = D.Vchcode
+                 LEFT JOIN ptype P ON D.PTYPEID = P.ptypeid
+        WHERE D.ptypeid = #{ptypeid}
+          AND A.Draft = 1
     </select>
+
 </mapper>

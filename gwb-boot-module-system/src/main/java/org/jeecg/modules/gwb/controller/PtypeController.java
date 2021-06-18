@@ -109,7 +109,17 @@ public class PtypeController extends JeecgController<Ptype, IPtypeService> {
      */
     @GetMapping({ "findViewVchDraftQtyOrderDtoListByPtypeId" })
     public Result<?> findViewVchDraftQtyOrderDtoListByPtypeId(@RequestParam String ptypeid) {
-        return Result.ok(this.findViewVchDraftQtyOrderDtoListByPtypeId(ptypeid));
+        return Result.ok(this.service.findViewVchDraftQtyOrderDtoListByPtypeId(ptypeid));
+    }
+
+    /**
+     * findViewVchSaleQtyOrderDtoListByPtypeId
+     * @param ptypeid
+     * @return
+     */
+    @GetMapping({ "findViewVchSaleQtyOrderDtoListByPtypeId" })
+    public Result<?> findViewVchSaleQtyOrderDtoListByPtypeId(@RequestParam String ptypeid) {
+        return Result.ok(this.service.findViewVchSaleQtyOrderDtoListByPtypeId(ptypeid));
     }
 
 }

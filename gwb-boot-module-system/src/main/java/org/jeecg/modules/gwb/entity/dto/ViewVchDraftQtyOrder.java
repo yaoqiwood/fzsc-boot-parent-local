@@ -18,7 +18,7 @@ public class ViewVchDraftQtyOrder {
 
     private Integer qty;
 
-    private String usedtype;
+    private String usedType;
 
     private String ptypeid;
 
