@@ -162,6 +162,7 @@
     </select>
 
     <select id="findWarehouseByNumRange" resultType="org.jeecg.modules.gwb.entity.dto.PtypeWareHouse">
+        SELECT * FROM (
         SELECT TOP ${pageSize} * FROM (
         SELECT TOP ${pageNoMSize} P.PtypeId,
         P.parId,
@@ -172,7 +173,9 @@
         P.area,
         P.pnamepy,
         G.Qty,
-        XU.unit1
+        XU.unit1 AS unit,
+        (SELECT COUNT(0) FROM DlySale D WHERE D.ptypeid = P.ptypeid) AS saleCount,
+        (SELECT SUM(qty) FROM DlySale D WHERE D.ptypeid = P.ptypeid) AS saleSum
         FROM ptype P
         LEFT JOIN GoodsStocks G ON P.ptypeid = G.ptypeid
         LEFT JOIN xw_PtypeUnit XU ON P.ptypeid =
@@ -181,14 +184,17 @@
         AND P.isStop = 0
         AND P.deleted = 0
         AND XU.IsBase = 1
+        AND P.pfullname NOT LIKE '%摩的%'
+        AND P.pfullname NOT LIKE '%快递%'
         AND (
         ( G.Qty &lt;= #{lessThanQtyNum} OR G.Qty IS NULL )
         <if test="biggerThanQtyNum != null and biggerThanQtyNum != ''">
             AND G.Qty &gt;= #{biggerThanQtyNum}
         </if>
         )
-        ORDER BY P.ptypeid ASC ) S
-        ORDER BY S.ptypeid DESC
+        ORDER BY saleCount DESC ) S
+        ORDER BY S.saleCount ASC
+        ) SS ORDER BY SS.saleCount DESC
     </select>
 
     <select id="countWarehouseByNumRange" resultType="java.lang.Long">
@@ -201,6 +207,8 @@
         AND P.isStop = 0
         AND P.deleted = 0
         AND XU.IsBase = 1
+        AND P.pfullname NOT LIKE '%摩的%'
+        AND P.pfullname NOT LIKE '%快递%'
         AND (
         ( G.Qty &lt;= #{lessThanQtyNum} OR G.Qty IS NULL )
         <if test="biggerThanQtyNum != null and biggerThanQtyNum != ''">

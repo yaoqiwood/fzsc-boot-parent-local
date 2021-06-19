@@ -274,15 +274,18 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
         Integer lessThanQtyNum = 1;
         Integer biggerThanQtyNum = null;
         Integer pageNoMSize = pageNo * pageSize;
-        if (null != object.getInteger("lessThanQtyNum")) {
+        if (null != object.getInteger("lessThanQtyNum") && 0 != object.getInteger("lessThanQtyNum")) {
             lessThanQtyNum = object.getInteger("lessThanQtyNum");
         }
         if (null != object.getInteger("biggerThanQtyNum")) {
             biggerThanQtyNum = object.getInteger("biggerThanQtyNum");
         }
 
-        List<PtypeWareHouse> wareHouseList = this.baseMapper.findWarehouseByNumRange(pageNoMSize, pageSize,
+        List<PtypeWareHouse> wareHouseList = this.baseMapper.findWarehouseByNumRange(pageSize, pageNoMSize,
                 lessThanQtyNum, biggerThanQtyNum);
+        for (PtypeWareHouse item : wareHouseList) {
+            item.setQty(item.getQty() != null ? item.getQty() : 0);
+        }
         Long count = this.baseMapper.countWarehouseByNumRange(lessThanQtyNum, biggerThanQtyNum);
         Page<PtypeWareHouse> wareHousePage = new Page<>();
         wareHousePage.setRecords(wareHouseList);

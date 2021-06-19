@@ -12,13 +12,19 @@ public class PtypeWareHouse {
 
     private String pusercode;
 
+    private String pfullname;
+
     private String type;
 
     private String area;
 
     private String pnamepy;
 
-    private String Qty;
+    private Integer Qty;
 
-    private String unit1;
+    private String unit;
+
+    private Integer saleCount;
+
+    private Integer saleSum;
 }
