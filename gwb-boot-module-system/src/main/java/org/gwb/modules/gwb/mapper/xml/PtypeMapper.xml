@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gwb.modules.gwb.mapper.PtypeMapper">
+    <select id="findContainENamePtype" resultType="org.gwb.modules.gwb.entity.Ptype">
+        SELECT *
+        FROM ptype A
+        WHERE A.pfullname LIKE '%e[0-9]%'
+          AND A.pfullname NOT LIKE '%E[A-Z]%'
+          AND A.pfullname NOT LIKE '%[A-Z]E%'
+          AND A.pfullname NOT LIKE '%[0-9]E%'
+          AND A.pfullname NOT LIKE '%[0-9,a-z]-E[0-9,a-z]%'
+    </select>
+
+    <resultMap id="viewResultPtypeStock" type="org.gwb.modules.gwb.entity.dto.ViewPtypeStockDto">
+        <result column="ptypeid" property="ptypeid"/>
+        <result column="pfullname" property="pfullname"/>
+        <result column="pusercode" property="pusercode"/>
+        <result column="type" property="type"/>
+        <result column="qty" property="qty"/>
+        <result column="unit1" property="unit"/>
+        <result column="draftCount" property="draftCount"/>
+        <result column="saleCount" property="saleCount"/>
+    </resultMap>
+
+    <resultMap id="viewResultPtypeStockByIdMap" type="org.gwb.modules.gwb.entity.dto.ViewPtypeStockDto">
+        <result column="ptypeid" property="ptypeid"/>
+        <result column="pfullname" property="pfullname"/>
+        <result column="pusercode" property="pusercode"/>
+        <result column="type" property="type"/>
+        <result column="qty" property="qty"/>
+        <result column="unit1" property="unit"/>
+    </resultMap>
+
+    <select id="viewSearchStockPtypeOverall" resultMap="viewResultPtypeStock">
+        SELECT *
+        FROM (
+        SELECT TOP ${pageSize} *
+        FROM (
+        SELECT TOP ${pageNoMSize} P.ptypeid,
+        P.pfullname,
+        P.pusercode,
+        P.type,
+        G.Qty,
+        PU.unit1,
+        (SELECT COUNT(0)
+        FROM Dlyndx A
+        LEFT JOIN BakDly D ON A.Vchcode = D.Vchcode
+        LEFT JOIN ptype PD ON D.PTYPEID = PD.ptypeid
+        WHERE D.ptypeid = P.ptypeid
+        AND A.Draft = 1) AS DraftCount,
+        (SELECT COUNT(0)
+        FROM Dlyndx A
+        LEFT JOIN DlySale DS ON A.Vchcode = DS.Vchcode
+        LEFT JOIN ptype PS ON DS.PtypeId = PS.ptypeid
+        WHERE A.Savedate BETWEEN #{saleDateBegin} AND #{saleDateEnd}
+        AND PS.ptypeid = P.ptypeid) AS SaleCount
+        FROM ptype P
+        LEFT JOIN GoodsStocks G ON P.ptypeid = G.PtypeId
+        LEFT JOIN xw_PtypeUnit PU ON P.ptypeid = PU.ptypeid
+        WHERE PU.IsBase = 1 AND P.soncount = 0
+        AND (P.deleted = 0
+        <if test='viewDeleted != null and viewDeleted == "1"'>
+            OR P.deleted = #{viewDeleted}
+        </if>)
+        AND (P.isStop = 0
+        <if test='viewStop != null and viewStop == "1"'>
+            OR P.isStop = #{viewDeleted}
+        </if>)
+        <if test="searchParams != null and searchParams != ''">
+            ${searchParams}
+        </if>
+        ORDER BY P.ptypeid ASC
+        ) S ORDER BY S.ptypeid DESC
+        ) SS
+    </select>
+
+
+    <select id="countSearchStockPtypeOverall" resultType="long">
+        SELECT COUNT(0)
+        FROM ptype P
+        LEFT JOIN GoodsStocks G ON P.ptypeid = G.PtypeId
+        LEFT JOIN xw_PtypeUnit PU ON P.ptypeid = PU.ptypeid
+        WHERE PU.IsBase = 1 AND P.soncount = 0
+        AND (P.deleted = 0
+        <if test='viewDeleted != null and viewDeleted == "1"'>
+            OR P.deleted = #{viewDeleted}
+        </if>)
+        AND (P.isStop = 0
+        <if test='viewStop != null and viewStop == "1"'>
+            OR P.isStop = #{viewDeleted}
+        </if>)
+        <if test="searchParams != null and searchParams != ''">
+            ${searchParams}
+        </if>
+    </select>
+
+    <select id="findViewPtypeOverallByPtypeId" resultMap="viewResultPtypeStockByIdMap">
+        SELECT P.ptypeid, P.pfullname, P.type, G.Qty, PU.unit1
+        FROM ptype P
+                 LEFT JOIN GoodsStocks G ON P.ptypeid = G.PtypeId
+                 LEFT JOIN xw_PtypeUnit PU ON P.ptypeid = PU.ptypeid
+        WHERE PU.IsBase = 1
+          AND P.soncount = 0
+          AND P.ptypeid = #{ptypeid}
+    </select>
+
+    <select id="viewVchDraftQtyOrderById" resultType="org.gwb.modules.gwb.entity.dto.ViewVchDraftQtyOrder">
+        SELECT A.Vchcode,
+               A.Date,
+               A.Number,
+               A.VchType,
+               A.summary,
+               A.Comment,
+               D.Qty,
+               D.usedtype,
+               P.ptypeid,
+               P.pfullname
+        FROM Dlyndx A
+                 LEFT JOIN BakDly D
+                           ON A.Vchcode = D.Vchcode
+                 LEFT JOIN ptype P ON D.PTYPEID = P.ptypeid
+        WHERE D.ptypeid = #{ptypeid}
+          AND A.Draft = 1
+    </select>
+
+    <select id="viewVchDlySaleQtyOrderByIdAndDate" resultType="org.gwb.modules.gwb.entity.dto.ViewVchDraftQtyOrder">
+        SELECT A.Vchcode,
+               A.Date,
+               A.Number,
+               A.VchType,
+               A.summary,
+               A.Comment,
+               DS.Qty,
+               P.ptypeid,
+               P.pfullname
+        FROM Dlyndx A
+                 LEFT JOIN DlySale DS ON A.Vchcode = DS.Vchcode
+                 LEFT JOIN ptype P ON DS.PtypeId = P.ptypeid
+        WHERE A.Savedate BETWEEN #{dateBegin} AND #{dateEnd}
+          AND P.ptypeid = #{ptypeid}
+    </select>
+
+
+    <select id="findViewVchDraftQtyOrderDtoListByPtypeId"
+            resultType="org.gwb.modules.gwb.entity.dto.ViewVchDraftQtyOrderDto">
+        SELECT A.Vchcode,
+               A.Date,
+               A.Number,
+               A.VchType,
+               A.summary,
+               A.Comment,
+               D.Qty,
+               D.usedtype,
+               P.ptypeid,
+               P.pfullname
+        FROM Dlyndx A
+                 LEFT JOIN BakDly D
+                           ON A.Vchcode = D.Vchcode
+                 LEFT JOIN ptype P ON D.PTYPEID = P.ptypeid
+        WHERE D.ptypeid = #{ptypeid}
+          AND A.Draft = 1
+    </select>
+
+    <select id="findWarehouseByNumRange" resultType="org.gwb.modules.gwb.entity.dto.PtypeWareHouse">
+        SELECT * FROM (
+        SELECT TOP ${pageSize} * FROM (
+        SELECT TOP ${pageNoMSize} P.PtypeId,
+        P.parId,
+        P.leveal,
+        P.pusercode,
+        P.pfullname,
+        P.type,
+        P.area,
+        P.pnamepy,
+        G.Qty,
+        XU.unit1 AS unit,
+        (SELECT COUNT(0) FROM DlySale D WHERE D.ptypeid = P.ptypeid) AS saleCount,
+        (SELECT SUM(qty) FROM DlySale D WHERE D.ptypeid = P.ptypeid) AS saleSum
+        FROM ptype P
+        LEFT JOIN GoodsStocks G ON P.ptypeid = G.ptypeid
+        LEFT JOIN xw_PtypeUnit XU ON P.ptypeid =
+        XU.ptypeid
+        WHERE P.soncount = 0
+        AND P.isStop = 0
+        AND P.deleted = 0
+        AND XU.IsBase = 1
+        AND P.pfullname NOT LIKE '%摩的%'
+        AND P.pfullname NOT LIKE '%快递%'
+        AND (
+        ( G.Qty &lt;= #{lessThanQtyNum} OR G.Qty IS NULL )
+        <if test="biggerThanQtyNum != null and biggerThanQtyNum != ''">
+            AND G.Qty &gt;= #{biggerThanQtyNum}
+        </if>
+        )
+        ORDER BY saleCount DESC ) S
+        ORDER BY S.saleCount ASC
+        ) SS ORDER BY SS.saleCount DESC
+    </select>
+
+    <select id="countWarehouseByNumRange" resultType="java.lang.Long">
+        SELECT COUNT(0)
+        FROM ptype P
+        LEFT JOIN GoodsStocks G ON P.ptypeid = G.ptypeid
+        LEFT JOIN xw_PtypeUnit XU ON P.ptypeid =
+        XU.ptypeid
+        WHERE P.soncount = 0
+        AND P.isStop = 0
+        AND P.deleted = 0
+        AND XU.IsBase = 1
+        AND P.pfullname NOT LIKE '%摩的%'
+        AND P.pfullname NOT LIKE '%快递%'
+        AND (
+        ( G.Qty &lt;= #{lessThanQtyNum} OR G.Qty IS NULL )
+        <if test="biggerThanQtyNum != null and biggerThanQtyNum != ''">
+            AND G.Qty &gt;= #{biggerThanQtyNum}
+        </if>
+        )
+    </select>
+
+    <select id="selectNewMaxUpdateTag" resultType="java.lang.Long">
+        SELECT MAX(p.updatetag) + 1 AS newMaxUpdateTag
+        FROM ptype p
+    </select>
+
+</mapper>

@@ -2,7 +2,7 @@ package ${bussiPackage}.${entityPackage}.service;
 
 import ${bussiPackage}.${entityPackage}.entity.${entityName};
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.jeecg.common.exception.JeecgBootException;
+import org.gwb.common.exception.JeecgBootException;
 
 /**
  * @Description: ${tableVo.ftlDescription}
