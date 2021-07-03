@@ -85,9 +85,4 @@ public interface PtypeMapper extends BaseMapper<Ptype> {
     Long countWarehouseByNumRange(@Param("lessThanQtyNum") Integer lessThanQtyNum,
             @Param("biggerThanQtyNum") Integer biggerThanQtyNum);
 
-    /**
-     * selectNewMaxUpdateTag
-     * @return
-     */
-    Long selectNewMaxUpdateTag();
 }

@@ -217,9 +217,5 @@
         )
     </select>
 
-    <select id="selectNewMaxUpdateTag" resultType="java.lang.Long">
-        SELECT MAX(p.updatetag) + 1 AS newMaxUpdateTag
-        FROM ptype p
-    </select>
 
 </mapper>

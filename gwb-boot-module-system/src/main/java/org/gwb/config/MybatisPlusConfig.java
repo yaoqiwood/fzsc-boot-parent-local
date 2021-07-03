@@ -3,6 +3,7 @@ package org.gwb.config;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 
 /**
@@ -11,7 +12,7 @@ import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
  *
  */
 @Configuration
-@MapperScan(value={"org.jeecg.modules.**.mapper*"})
+@MapperScan(value = { "org.gwb.modules.**.mapper*" })
 public class MybatisPlusConfig {
 
     /**
@@ -22,14 +23,13 @@ public class MybatisPlusConfig {
         // 设置sql的limit为无限制，默认是500
         return new PaginationInterceptor().setLimit(-1);
     }
-    
-//    /**
-//     * mybatis-plus SQL执行效率插件【生产环境可以关闭】
-//     */
-//    @Bean
-//    public PerformanceInterceptor performanceInterceptor() {
-//        return new PerformanceInterceptor();
-//    }
-    
-   
+
+    // /**
+    // * mybatis-plus SQL执行效率插件【生产环境可以关闭】
+    // */
+    // @Bean
+    // public PerformanceInterceptor performanceInterceptor() {
+    // return new PerformanceInterceptor();
+    // }
+
 }

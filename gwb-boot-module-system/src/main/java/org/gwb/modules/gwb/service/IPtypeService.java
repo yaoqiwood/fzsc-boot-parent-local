@@ -49,4 +49,11 @@ public interface IPtypeService extends IService<Ptype> {
      */
     void changeContainerNoByPtypeId(String ptypeId, String containerNo);
 
+    /**
+     * 查找产品通过id
+     * @param ptypeId
+     * @return
+     */
+    Ptype findPtypeById(String ptypeId);
+
 }

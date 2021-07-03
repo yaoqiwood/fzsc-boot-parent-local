@@ -149,4 +149,14 @@ public class PtypeController extends JeecgController<Ptype, IPtypeService> {
         this.service.changeContainerNoByPtypeId(ptype.getPtypeid(), ptype.getPusercode());
         return Result.ok("修改成功");
     }
+
+    /**
+     * findPtypeById
+     * @param ptypeId
+     * @return
+     */
+    @GetMapping({ "findPtypeById" })
+    public Result<?> findPtypeById(@RequestParam String ptypeId) {
+        return Result.ok(this.service.findPtypeById(ptypeId));
+    }
 }

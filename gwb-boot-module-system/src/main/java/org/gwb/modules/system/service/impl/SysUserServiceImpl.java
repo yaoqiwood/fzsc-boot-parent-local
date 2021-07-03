@@ -41,12 +41,12 @@ import lombok.extern.slf4j.Slf4j;
  * @Author: scott
  * @Date: 2018-12-20
  */
-@Service
 @Slf4j
+@Service
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {
 
-    @Autowired
-    private SysUserMapper userMapper;
+    // @Autowired
+    // private SysUserMapper userMapper;
 
     @Autowired
     private SysPermissionMapper sysPermissionMapper;
@@ -78,7 +78,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     @CacheEvict(value = { CacheConstant.SYS_USERS_CACHE }, allEntries = true)
     public Result<?> resetPassword(String username, String oldpassword, String newpassword, String confirmpassword) {
-        SysUser user = userMapper.getUserByName(username);
+        SysUser user = this.baseMapper.getUserByName(username);
         String passwordEncode = PasswordUtil.encrypt(username, oldpassword, user.getSalt());
         if (!user.getPassword().equals(passwordEncode)) {
             return Result.error("旧密码输入错误!");
@@ -90,7 +90,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             return Result.error("两次输入密码不一致!");
         }
         String password = PasswordUtil.encrypt(username, newpassword, user.getSalt());
-        this.userMapper.update(new SysUser().setPassword(password),
+        this.baseMapper.update(new SysUser().setPassword(password),
                 new LambdaQueryWrapper<SysUser>().eq(SysUser::getId, user.getId()));
         return Result.ok("密码重置成功!");
     }
@@ -103,7 +103,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         String password = sysUser.getPassword();
         String passwordEncode = PasswordUtil.encrypt(sysUser.getUsername(), password, salt);
         sysUser.setPassword(passwordEncode);
-        this.userMapper.updateById(sysUser);
+        this.baseMapper.updateById(sysUser);
         return Result.ok("密码修改成功!");
     }
 
@@ -127,7 +127,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public SysUser getUserByName(String username) {
-        return userMapper.getUserByName(username);
+        return this.baseMapper.getUserByName(username);
     }
 
     @Override
@@ -239,12 +239,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     // 根据部门Id查询
     @Override
     public IPage<SysUser> getUserByDepId(Page<SysUser> page, String departId, String username) {
-        return userMapper.getUserByDepId(page, departId, username);
+        return this.baseMapper.getUserByDepId(page, departId, username);
     }
 
     @Override
     public IPage<SysUser> getUserByDepIds(Page<SysUser> page, List<String> departIds, String username) {
-        return userMapper.getUserByDepIds(page, departIds, username);
+        return this.baseMapper.getUserByDepIds(page, departIds, username);
     }
 
     @Override
@@ -271,7 +271,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         lambdaQueryWrapper.inSql(SysUser::getId,
                 "SELECT user_id FROM sys_user_depart WHERE dep_id = '" + departId + "'");
 
-        return userMapper.selectPage(page, lambdaQueryWrapper);
+        return this.baseMapper.selectPage(page, lambdaQueryWrapper);
     }
 
     @Override
@@ -288,7 +288,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     // 根据角色Id查询
     @Override
     public IPage<SysUser> getUserByRoleId(Page<SysUser> page, String roleId, String username) {
-        return userMapper.getUserByRoleId(page, roleId, username);
+        return this.baseMapper.getUserByRoleId(page, roleId, username);
     }
 
     @Override
@@ -299,12 +299,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public SysUser getUserByPhone(String phone) {
-        return userMapper.getUserByPhone(phone);
+        return this.baseMapper.getUserByPhone(phone);
     }
 
     @Override
     public SysUser getUserByEmail(String email) {
-        return userMapper.getUserByEmail(email);
+        return this.baseMapper.getUserByEmail(email);
     }
 
     @Override
@@ -400,13 +400,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             wrapper = new LambdaQueryWrapper<>();
         }
         wrapper.eq(SysUser::getDelFlag, "1");
-        return userMapper.selectLogicDeleted(wrapper);
+        return this.baseMapper.selectLogicDeleted(wrapper);
     }
 
     @Override
     public boolean revertLogicDeleted(List<String> userIds, SysUser updateEntity) {
         String ids = String.format("'%s'", String.join("','", userIds));
-        return userMapper.revertLogicDeleted(ids, updateEntity) > 0;
+        return this.baseMapper.revertLogicDeleted(ids, updateEntity) > 0;
     }
 
     @Override
@@ -414,7 +414,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public boolean removeLogicDeleted(List<String> userIds) {
         String ids = String.format("'%s'", String.join("','", userIds));
         // 1. 删除用户
-        int line = userMapper.deleteLogicDeleted(ids);
+        int line = this.baseMapper.deleteLogicDeleted(ids);
         // 2. 删除用户部门关系
         line += sysUserDepartMapper
                 .delete(new LambdaQueryWrapper<SysUserDepart>().in(SysUserDepart::getUserId, userIds));
@@ -426,8 +426,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateNullPhoneEmail() {
-        userMapper.updateNullByEmptyString("email");
-        userMapper.updateNullByEmptyString("phone");
+        this.baseMapper.updateNullByEmptyString("email");
+        this.baseMapper.updateNullByEmptyString("phone");
         return true;
     }
 
@@ -449,7 +449,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public List<SysUser> queryByDepIds(List<String> departIds, String username) {
-        return userMapper.queryByDepIds(departIds, username);
+        return this.baseMapper.queryByDepIds(departIds, username);
     }
 
     @Override
@@ -489,6 +489,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         sysUser.setCreateBy(null);
         sysUser.setCreateTime(null);
         return sysUser;
+    }
+
+    @Override
+    public QueryWrapper<SysUser> buildWrapper(SysUser sysUser) {
+        return null;
     }
 
     // SysUser user = new SysUser();

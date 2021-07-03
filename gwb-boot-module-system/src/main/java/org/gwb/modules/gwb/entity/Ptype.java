@@ -2,11 +2,14 @@ package org.gwb.modules.gwb.entity;
 
 import java.math.BigDecimal;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+
 import lombok.Data;
 
 @Data
 public class Ptype {
 
+    @TableId
     private String ptypeid;
 
     private String parid;

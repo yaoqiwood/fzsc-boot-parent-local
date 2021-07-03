@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.gwb.common.constant.MikkoConstants;
 import org.gwb.common.enumerate.EnumMethodType;
 import org.gwb.common.enumerate.EnumSyncPtypeStatus;
 import org.gwb.common.enumerate.EnumVchType;
@@ -14,14 +15,17 @@ import org.gwb.common.exception.JeecgBootException;
 import org.gwb.common.util.*;
 import org.gwb.modules.gwb.entity.HisPtpyeSync;
 import org.gwb.modules.gwb.entity.Ptype;
+import org.gwb.modules.gwb.entity.XwBaseupdatetag;
 import org.gwb.modules.gwb.entity.dto.*;
 import org.gwb.modules.gwb.mapper.PtypeMapper;
+import org.gwb.modules.gwb.mapper.XwBaseupdatetagMapper;
 import org.gwb.modules.gwb.service.IHisPtpyeSyncService;
 import org.gwb.modules.gwb.service.IPtypeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -49,6 +53,13 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
 
     @Autowired
     private IHisPtpyeSyncService hisPtpyeSyncService;
+
+    private XwBaseupdatetagMapper baseupdatetagMapper;
+
+    @Autowired
+    public void setBaseupdatetagMapper(XwBaseupdatetagMapper baseupdatetagMapper) {
+        this.baseupdatetagMapper = baseupdatetagMapper;
+    }
 
     private final String USED_TYPE_REDUCE = "1";
 
@@ -297,6 +308,7 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
     }
 
     @DS("multi-datasource-gwb")
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void changePtypeHZPinyinName2Xz() {
         log.info("行走错误拼音定时修改任务开始......");
@@ -311,24 +323,50 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
             if (item.getPnamepy().equals(PingYinUtil.getFirstSpell(item.getPfullname()))) {
                 continue;
             }
+            // 创建更新类（产品信息）
             Ptype ptype4Update = new Ptype();
-            Long newUpdateTag = this.baseMapper.selectNewMaxUpdateTag();
+            Integer newUpdateTag = this.baseupdatetagMapper.selectNewMaxUpdateTag();
             ptype4Update.setPnamepy(PingYinUtil.getFirstSpell(item.getPfullname()));
             QueryWrapper<Ptype> updateWrapper = new QueryWrapper<>();
             updateWrapper.lambda().eq(Ptype::getPtypeid, item.getPtypeid());
+            // 创建更新类（更新最大id
+            XwBaseupdatetag xwBaseupdatetag4Update = new XwBaseupdatetag();
+            // updateTagId
+            xwBaseupdatetag4Update.setUpdatetag(newUpdateTag);
+            ptype4Update.setUpdatetag(newUpdateTag);
+            QueryWrapper<XwBaseupdatetag> baseUpdateTagWrapper = new QueryWrapper<>();
+            baseUpdateTagWrapper.lambda().eq(XwBaseupdatetag::getBasetype, MikkoConstants.TableType);
+            this.baseupdatetagMapper.update(xwBaseupdatetag4Update, baseUpdateTagWrapper);
             this.baseMapper.update(ptype4Update, updateWrapper);
+            log.info("更新UpdateTag为：" + newUpdateTag);
             count++;
         }
         log.info("行走错误拼音定时修改任务结束：" + MikkoDateUtils.getNowTime() + "\n 查询数: " + sum + "  更新数量:" + count);
     }
 
+    @DS("multi-datasource-gwb")
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void changeContainerNoByPtypeId(String ptypeId, String containerNo) {
+        Integer newUpdateTag = this.baseupdatetagMapper.selectNewMaxUpdateTag();
         QueryWrapper<Ptype> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Ptype::getPtypeid, ptypeId);
         Ptype ptype4Update = new Ptype();
+        XwBaseupdatetag xwBaseupdatetag4Update = new XwBaseupdatetag();
         ptype4Update.setPusercode(containerNo);
+        ptype4Update.setUpdatetag(newUpdateTag);
+        xwBaseupdatetag4Update.setUpdatetag(newUpdateTag);
+        QueryWrapper<XwBaseupdatetag> updateTagWrapper = new QueryWrapper<>();
+        updateTagWrapper.lambda().eq(XwBaseupdatetag::getBasetype, MikkoConstants.TableType);
+        this.baseupdatetagMapper.update(xwBaseupdatetag4Update, updateTagWrapper);
         this.baseMapper.update(ptype4Update, queryWrapper);
+    }
+
+    @DS("multi-datasource-gwb")
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Ptype findPtypeById(String ptypeId) {
+        return this.getById(ptypeId);
     }
 
     private String httpGetSyncMethodFromServer(String url, BufferedReader reader) throws IOException {
