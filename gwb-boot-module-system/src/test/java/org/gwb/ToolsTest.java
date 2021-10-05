@@ -8,6 +8,6 @@ public class ToolsTest {
         // long a = 1.1;
         // System.out.println();
         // System.out.println(EnumVchType.getMethodByCode("16"));
-        System.out.println(PingYinUtil.getFirstSpell("弹簧"));
+        System.out.println(PingYinUtil.getFirstSpell("刹车"));
     }
 }

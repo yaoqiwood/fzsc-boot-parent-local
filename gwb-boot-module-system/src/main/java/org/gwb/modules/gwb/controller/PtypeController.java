@@ -141,12 +141,13 @@ public class PtypeController extends JeecgController<Ptype, IPtypeService> {
      * @return
      * @throws ValidationException
      */
-    @PostMapping({ "changeContainerNoByPtypeId" })
-    public Result<?> changeContainerNoByPtypeId(@RequestBody Ptype ptype) throws ValidationException {
-        if (Strings.isNullOrEmpty(ptype.getPtypeid()) || Strings.isNullOrEmpty(ptype.getPusercode())) {
+    @PostMapping({ "modifyContainerInfoByPtypeId" })
+    public Result<?> modifyContainerInfoByPtypeId(@RequestBody Ptype ptype) throws ValidationException {
+        if (Strings.isNullOrEmpty(ptype.getPtypeid()) || Strings.isNullOrEmpty(ptype.getPusercode())
+                || Strings.isNullOrEmpty(ptype.getPfullname())) {
             throw new ValidationException("错误");
         }
-        this.service.changeContainerNoByPtypeId(ptype.getPtypeid(), ptype.getPusercode());
+        this.service.modifyContainerInfoByPtypeId(ptype.getPtypeid(), ptype.getPusercode(), ptype.getPfullname());
         return Result.ok("修改成功");
     }
 

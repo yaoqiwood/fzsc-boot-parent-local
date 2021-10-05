@@ -316,6 +316,7 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
         queryWrapper.lambda().like(Ptype::getPnamepy, "hz");
         queryWrapper.lambda().like(Ptype::getPfullname, "行走");
         queryWrapper.lambda().or(sql -> sql.like(Ptype::getPnamepy, "dh").like(Ptype::getPfullname, "弹簧"));
+        queryWrapper.lambda().or(sql -> sql.like(Ptype::getPnamepy, "cc").like(Ptype::getPfullname, "刹车"));
         List<Ptype> ptypeList = this.list(queryWrapper);
         Integer sum = ptypeList.size();
         Integer count = 0;
@@ -347,13 +348,14 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
     @DS("multi-datasource-gwb")
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void changeContainerNoByPtypeId(String ptypeId, String containerNo) {
+    public void modifyContainerInfoByPtypeId(String ptypeId, String containerNo, String pfullName) {
         Integer newUpdateTag = this.baseupdatetagMapper.selectNewMaxUpdateTag();
         QueryWrapper<Ptype> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Ptype::getPtypeid, ptypeId);
         Ptype ptype4Update = new Ptype();
         XwBaseupdatetag xwBaseupdatetag4Update = new XwBaseupdatetag();
         ptype4Update.setPusercode(containerNo);
+        ptype4Update.setPfullname(pfullName);
         ptype4Update.setUpdatetag(newUpdateTag);
         xwBaseupdatetag4Update.setUpdatetag(newUpdateTag);
         QueryWrapper<XwBaseupdatetag> updateTagWrapper = new QueryWrapper<>();
