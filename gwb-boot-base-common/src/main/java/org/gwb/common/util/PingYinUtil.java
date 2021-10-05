@@ -53,7 +53,7 @@ public class PingYinUtil {
                 try {
                     String[] temp = PinyinHelper.toHanyuPinyinStringArray(arr[i], defaultFormat);
                     if (temp != null) {
-                        if (i != arr.length - 1 && arr[i] == '弹' && arr[i + 1] == '簧') {
+                        if ((arr[i] == '弹' && arr[i + 1] == '簧') || (arr[i] == '刹' && arr[i + 1] == '车')) {
                             pybf.append(temp[1].charAt(0));
                         } else {
                             pybf.append(temp[0].charAt(0));
