@@ -386,6 +386,12 @@
             <version>1.2.2</version>
         </dependency>
 
+        <!--   自定义     -->
+        <dependency>
+            <groupId>meme.cat</groupId>
+            <artifactId>meme-cat-generator-basic</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
     </dependencies>
 
