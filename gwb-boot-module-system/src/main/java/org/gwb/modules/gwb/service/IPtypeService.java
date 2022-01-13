@@ -5,10 +5,7 @@ import java.util.List;
 
 import org.gwb.modules.gwb.entity.HisPtpyeSync;
 import org.gwb.modules.gwb.entity.Ptype;
-import org.gwb.modules.gwb.entity.dto.PtypeWareHouse;
-import org.gwb.modules.gwb.entity.dto.ViewPtypeStockDto;
-import org.gwb.modules.gwb.entity.dto.ViewVchDraftQtyOrderDto;
-import org.gwb.modules.gwb.entity.dto.ViewVchSaleQtyOrderDto;
+import org.gwb.modules.gwb.entity.dto.*;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -54,6 +51,6 @@ public interface IPtypeService extends IService<Ptype> {
      * @param ptypeId
      * @return
      */
-    Ptype findPtypeById(String ptypeId);
+    ViewPtypeInf2ModifyDto findPtypeById(String ptypeId);
 
 }

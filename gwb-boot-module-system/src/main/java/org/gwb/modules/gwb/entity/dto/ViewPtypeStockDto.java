@@ -8,6 +8,8 @@ public class ViewPtypeStockDto {
 
     private String pfullname;
 
+    private String barcode;
+
     private String pusercode;
 
     private String type;

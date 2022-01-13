@@ -6,6 +6,7 @@ import org.gwb.common.api.vo.Result;
 import org.gwb.common.system.base.controller.JeecgController;
 import org.gwb.modules.gwb.entity.HisPtpyeSync;
 import org.gwb.modules.gwb.entity.Ptype;
+import org.gwb.modules.gwb.entity.dto.ViewPtypeInf2ModifyDto;
 import org.gwb.modules.gwb.service.IHisPtpyeSyncService;
 import org.gwb.modules.gwb.service.IPtypeService;
 import org.gwb.modules.gwb.service.IXwPPtypePriceService;
@@ -142,12 +143,13 @@ public class PtypeController extends JeecgController<Ptype, IPtypeService> {
      * @throws ValidationException
      */
     @PostMapping({ "modifyContainerInfoByPtypeId" })
-    public Result<?> modifyContainerInfoByPtypeId(@RequestBody Ptype ptype) throws ValidationException {
-        if (Strings.isNullOrEmpty(ptype.getPtypeid()) || Strings.isNullOrEmpty(ptype.getPusercode())
+    public Result<?> modifyContainerInfoByPtypeId(@RequestBody ViewPtypeInf2ModifyDto ptype)
+            throws ValidationException {
+        if (Strings.isNullOrEmpty(ptype.getPtypeid()) || Strings.isNullOrEmpty(ptype.getBarcode())
                 || Strings.isNullOrEmpty(ptype.getPfullname())) {
             throw new ValidationException("错误");
         }
-        this.service.modifyContainerInfoByPtypeId(ptype.getPtypeid(), ptype.getPusercode(), ptype.getPfullname());
+        this.service.modifyContainerInfoByPtypeId(ptype.getPtypeid(), ptype.getBarcode(), ptype.getPfullname());
         return Result.ok("修改成功");
     }
 

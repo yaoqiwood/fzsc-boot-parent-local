@@ -22,9 +22,23 @@
         <result column="saleCount" property="saleCount"/>
     </resultMap>
 
+    <resultMap id="ViewPtypeInf2ModifyMap" type="org.gwb.modules.gwb.entity.dto.ViewPtypeInf2ModifyDto">
+        <result column="ptypeid" property="ptypeid"/>
+        <result column="pfullname" property="pfullname"/>
+        <result column="pusercode" property="pusercode"/>
+        <result column="BarCode" property="barcode"/>
+        <result column="soncount" property="soncount"/>
+        <result column="pname" property="pname"/>
+        <result column="Standard" property="standard"/>
+        <result column="Type" property="type"/>
+        <result column="Area" property="area"/>
+        <result column="updatetag" property="updateTag"/>
+    </resultMap>
+
     <resultMap id="viewResultPtypeStockByIdMap" type="org.gwb.modules.gwb.entity.dto.ViewPtypeStockDto">
         <result column="ptypeid" property="ptypeid"/>
         <result column="pfullname" property="pfullname"/>
+        <result column="BarCode" property="barcode"/>
         <result column="pusercode" property="pusercode"/>
         <result column="type" property="type"/>
         <result column="qty" property="qty"/>
@@ -38,6 +52,7 @@
         FROM (
         SELECT TOP ${pageNoMSize} P.ptypeid,
         P.pfullname,
+        XP.BarCode,
         P.pusercode,
         P.type,
         G.Qty,
@@ -57,6 +72,7 @@
         FROM ptype P
         LEFT JOIN GoodsStocks G ON P.ptypeid = G.PtypeId
         LEFT JOIN xw_PtypeUnit PU ON P.ptypeid = PU.ptypeid
+        LEFT JOIN xw_PtypeBarCode XP ON P.ptypeid = XP.PTypeId
         WHERE PU.IsBase = 1 AND P.soncount = 0
         AND (P.deleted = 0
         <if test='viewDeleted != null and viewDeleted == "1"'>
@@ -215,6 +231,23 @@
             AND G.Qty &gt;= #{biggerThanQtyNum}
         </if>
         )
+    </select>
+
+    <select id="viewPtypeInf2Modify" resultMap="ViewPtypeInf2ModifyMap">
+        SELECT P.ptypeid,
+               P.pfullname,
+               P.pusercode,
+               XP.BarCode,
+               P.soncount,
+               P.pname,
+               P.Standard,
+               P.Type,
+               P.Area,
+               P.updatetag
+        FROM ptype P
+                 LEFT JOIN xw_PtypeBarCode XP
+                           ON P.ptypeid = XP.PTypeId
+        WHERE P.ptypeid = #{ptypeId}
     </select>
 
 

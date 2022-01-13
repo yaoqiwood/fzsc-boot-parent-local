@@ -16,11 +16,13 @@ import org.gwb.common.util.*;
 import org.gwb.modules.gwb.entity.HisPtpyeSync;
 import org.gwb.modules.gwb.entity.Ptype;
 import org.gwb.modules.gwb.entity.XwBaseupdatetag;
+import org.gwb.modules.gwb.entity.XwPtypeBarCode;
 import org.gwb.modules.gwb.entity.dto.*;
 import org.gwb.modules.gwb.mapper.PtypeMapper;
 import org.gwb.modules.gwb.mapper.XwBaseupdatetagMapper;
 import org.gwb.modules.gwb.service.IHisPtpyeSyncService;
 import org.gwb.modules.gwb.service.IPtypeService;
+import org.gwb.modules.gwb.service.IXwPtypeBarCodeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,9 +58,16 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
 
     private XwBaseupdatetagMapper baseupdatetagMapper;
 
+    private IXwPtypeBarCodeService barCodeService;
+
     @Autowired
     public void setBaseupdatetagMapper(XwBaseupdatetagMapper baseupdatetagMapper) {
         this.baseupdatetagMapper = baseupdatetagMapper;
+    }
+
+    @Autowired
+    public void setBarCodeService(IXwPtypeBarCodeService barCodeService) {
+        this.barCodeService = barCodeService;
     }
 
     private final String USED_TYPE_REDUCE = "1";
@@ -353,8 +362,22 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
         QueryWrapper<Ptype> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Ptype::getPtypeid, ptypeId);
         Ptype ptype4Update = new Ptype();
+        XwPtypeBarCode xwPtypeBarCode4Update = new XwPtypeBarCode();
+        // 查找当前是否有一个数量大于1的barcode记录
+        xwPtypeBarCode4Update.setPTypeId(ptypeId);
+        xwPtypeBarCode4Update.setBarCode(containerNo);
+        int barCount = this.barCodeService
+                .count(new QueryWrapper<XwPtypeBarCode>().lambda().eq(XwPtypeBarCode::getPTypeId, ptypeId));
+        if (barCount > 0) {
+            this.barCodeService.updateById(xwPtypeBarCode4Update);
+        } else {
+            xwPtypeBarCode4Update.setUnitID("0");
+            xwPtypeBarCode4Update.setOrdid("0");
+            xwPtypeBarCode4Update.setKeyid(SnowflakeUtil.getNum().toString());
+            this.barCodeService.save(xwPtypeBarCode4Update);
+        }
         XwBaseupdatetag xwBaseupdatetag4Update = new XwBaseupdatetag();
-        ptype4Update.setPusercode(containerNo);
+        // ptype4Update.setPusercode(containerNo);
         ptype4Update.setPfullname(pfullName);
         ptype4Update.setUpdatetag(newUpdateTag);
         xwBaseupdatetag4Update.setUpdatetag(newUpdateTag);
@@ -367,8 +390,8 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
     @DS("multi-datasource-gwb")
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Ptype findPtypeById(String ptypeId) {
-        return this.getById(ptypeId);
+    public ViewPtypeInf2ModifyDto findPtypeById(String ptypeId) {
+        return this.baseMapper.viewPtypeInf2Modify(ptypeId);
     }
 
     private String httpGetSyncMethodFromServer(String url, BufferedReader reader) throws IOException {

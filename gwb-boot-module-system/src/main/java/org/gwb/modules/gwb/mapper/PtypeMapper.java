@@ -4,10 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 import org.gwb.modules.gwb.entity.Ptype;
-import org.gwb.modules.gwb.entity.dto.PtypeWareHouse;
-import org.gwb.modules.gwb.entity.dto.ViewPtypeStockDto;
-import org.gwb.modules.gwb.entity.dto.ViewVchDraftQtyOrder;
-import org.gwb.modules.gwb.entity.dto.ViewVchDraftQtyOrderDto;
+import org.gwb.modules.gwb.entity.dto.*;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -85,4 +82,10 @@ public interface PtypeMapper extends BaseMapper<Ptype> {
     Long countWarehouseByNumRange(@Param("lessThanQtyNum") Integer lessThanQtyNum,
             @Param("biggerThanQtyNum") Integer biggerThanQtyNum);
 
+    /**
+     * viewPtypeInf2Modify
+     * @param ptypeId
+     * @return
+     */
+    ViewPtypeInf2ModifyDto viewPtypeInf2Modify(@Param("ptypeId") String ptypeId);
 }
