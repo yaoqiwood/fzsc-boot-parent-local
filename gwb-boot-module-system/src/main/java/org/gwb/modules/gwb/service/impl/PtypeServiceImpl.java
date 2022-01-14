@@ -387,6 +387,52 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
         this.baseMapper.update(ptype4Update, queryWrapper);
     }
 
+    /**
+     * 批量修改货柜号
+     * @param ptypeIdArray
+     * @param containerNo
+     */
+    @DS("multi-datasource-gwb")
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void batchModifyContainerInfoByPtypeId(List<String> ptypeIdArray, String containerNo) {
+        // maxTagId + 1
+        Integer newUpdateTag = this.baseupdatetagMapper.selectNewMaxUpdateTag();
+        // baseBarcode
+        // 遍历ptypeId List
+        for (String ptypeId : ptypeIdArray) {
+            XwPtypeBarCode ptypeBarCode4Update = new XwPtypeBarCode();
+            // 准备更新PtypeId 对应ptype表
+            Ptype ptype4Update = new Ptype();
+            ptype4Update.setPtypeid(ptypeId);
+            ptype4Update.setUpdatetag(newUpdateTag);
+
+            // 准备更新barcode表对应 ptypeid 的货柜No
+            ptypeBarCode4Update.setPTypeId(ptypeId);
+            ptypeBarCode4Update.setBarCode(containerNo);
+
+            // 查询barcode表对应id是否有一个或没有的记录 有则更新 无则插入
+            int barcodeCount = this.barCodeService
+                    .count(new QueryWrapper<XwPtypeBarCode>().lambda().eq(XwPtypeBarCode::getPTypeId, ptypeId));
+            if (barcodeCount > 0) {
+                this.barCodeService.updateById(ptypeBarCode4Update);
+            } else {
+                ptypeBarCode4Update.setUnitID("0");
+                ptypeBarCode4Update.setOrdid("0");
+                ptypeBarCode4Update.setKeyid(SnowflakeUtil.getNum().toString());
+                this.barCodeService.save(ptypeBarCode4Update);
+            }
+            // 更新基本tag表信息
+            XwBaseupdatetag xwBaseupdatetag4Update = new XwBaseupdatetag();
+            xwBaseupdatetag4Update.setUpdatetag(newUpdateTag);
+            QueryWrapper<XwBaseupdatetag> updateTagWrapper = new QueryWrapper<>();
+            updateTagWrapper.lambda().eq(XwBaseupdatetag::getBasetype, MikkoConstants.TableType);
+            this.baseupdatetagMapper.update(xwBaseupdatetag4Update, updateTagWrapper);
+            // 更新ptype对应记录信息（maxUpdateTag)
+            this.baseMapper.update(ptype4Update, new QueryWrapper<Ptype>().lambda().eq(Ptype::getPtypeid, ptypeId));
+        }
+    }
+
     @DS("multi-datasource-gwb")
     @Transactional(rollbackFor = Exception.class)
     @Override

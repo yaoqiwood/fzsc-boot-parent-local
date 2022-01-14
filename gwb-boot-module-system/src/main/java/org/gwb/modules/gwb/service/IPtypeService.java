@@ -47,6 +47,13 @@ public interface IPtypeService extends IService<Ptype> {
     void modifyContainerInfoByPtypeId(String ptypeId, String containerNo, String pfullName);
 
     /**
+     * 批量修改货柜号
+     * @param ptypeIdArray
+     * @param containerNo
+     */
+    void batchModifyContainerInfoByPtypeId(List<String> ptypeIdArray, String containerNo);
+
+    /**
      * 查找产品通过id
      * @param ptypeId
      * @return

@@ -1,5 +1,8 @@
 package org.gwb.modules.gwb.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.ValidationException;
 
 import org.gwb.common.api.vo.Result;
@@ -13,6 +16,7 @@ import org.gwb.modules.gwb.service.IXwPPtypePriceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
 
@@ -150,6 +154,27 @@ public class PtypeController extends JeecgController<Ptype, IPtypeService> {
             throw new ValidationException("错误");
         }
         this.service.modifyContainerInfoByPtypeId(ptype.getPtypeid(), ptype.getBarcode(), ptype.getPfullname());
+        return Result.ok("修改成功");
+    }
+
+    /**
+     * batchModifyContainerInfoByPtypeId
+     * @param params
+     * @return
+     * @throws ValidationException
+     */
+    @PostMapping({ "batchModifyContainerInfoByPtypeId" })
+    public Result<?> batchModifyContainerInfoByPtypeId(@RequestBody JSONObject params) throws ValidationException {
+        List<String> batchPtypeIdList = new ArrayList<>();
+        if (Strings.isNullOrEmpty(params.getString("batchPtypeId"))
+                || Strings.isNullOrEmpty(params.getString("containerNo"))) {
+            throw new ValidationException("错误");
+        }
+        batchPtypeIdList = JSONArray.parseArray(params.getString("batchPtypeId"), String.class);
+        if (batchPtypeIdList.size() == 0) {
+            throw new ValidationException("错误，参数有误");
+        }
+        this.service.batchModifyContainerInfoByPtypeId(batchPtypeIdList, params.getString("containerNo"));
         return Result.ok("修改成功");
     }
 
