@@ -422,15 +422,15 @@ public class PtypeServiceImpl extends ServiceImpl<PtypeMapper, Ptype> implements
                 ptypeBarCode4Update.setKeyid(SnowflakeUtil.getNum().toString());
                 this.barCodeService.save(ptypeBarCode4Update);
             }
-            // 更新基本tag表信息
-            XwBaseupdatetag xwBaseupdatetag4Update = new XwBaseupdatetag();
-            xwBaseupdatetag4Update.setUpdatetag(newUpdateTag);
-            QueryWrapper<XwBaseupdatetag> updateTagWrapper = new QueryWrapper<>();
-            updateTagWrapper.lambda().eq(XwBaseupdatetag::getBasetype, MikkoConstants.TableType);
-            this.baseupdatetagMapper.update(xwBaseupdatetag4Update, updateTagWrapper);
             // 更新ptype对应记录信息（maxUpdateTag)
             this.baseMapper.update(ptype4Update, new QueryWrapper<Ptype>().lambda().eq(Ptype::getPtypeid, ptypeId));
         }
+        // 更新基本tag表信息
+        XwBaseupdatetag xwBaseupdatetag4Update = new XwBaseupdatetag();
+        xwBaseupdatetag4Update.setUpdatetag(newUpdateTag);
+        QueryWrapper<XwBaseupdatetag> updateTagWrapper = new QueryWrapper<>();
+        updateTagWrapper.lambda().eq(XwBaseupdatetag::getBasetype, MikkoConstants.TableType);
+        this.baseupdatetagMapper.update(xwBaseupdatetag4Update, updateTagWrapper);
     }
 
     @DS("multi-datasource-gwb")
